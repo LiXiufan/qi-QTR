@@ -72,7 +72,7 @@ def plot_gamma_comparison(files, scale='linear', base=10, fit_curve=True):
                         linestyle=linestyle, markersize=6, 
                         markerfacecolor='white', markeredgewidth=1.5)
                 # Use shaded area for errors matching the dataset color
-                ax.fill_between(x_u, y_u - yerr_u, y_u + yerr_u, color=color, alpha=0.15, linewidth=0)
+                # ax.fill_between(x_u, y_u - yerr_u, y_u + yerr_u, color=color, alpha=0.15, linewidth=0)
                 continue
             
             # Plot the raw data as markers (no lines)
@@ -80,7 +80,7 @@ def plot_gamma_comparison(files, scale='linear', base=10, fit_curve=True):
                     linestyle='None', markersize=6, 
                     markerfacecolor='white', markeredgewidth=1.5)
             # Use shaded area for errors matching the dataset color
-            ax.fill_between(x_u, y_u - yerr_u, y_u + yerr_u, color=color, alpha=0.15, linewidth=0)
+            # ax.fill_between(x_u, y_u - yerr_u, y_u + yerr_u, color=color, alpha=0.15, linewidth=0)
             
             # Apply an intelligent selection approach: dynamically testing multiple functional forms 
             # (Higher degree polynomial, Logarithmic, Inverse 1/x, and Exponential saturation)
@@ -176,10 +176,11 @@ def plot_gamma_comparison(files, scale='linear', base=10, fit_curve=True):
 def main():
     # File mapping with distinct symbols, standard colors, and linestyles
     files = {
-        '128 Shots': ('fixed_gamma_shot_128.csv', 's', '#d62728', '-'),
+        # '128 Shots': ('fixed_gamma_shot_128.csv', 's', '#d62728', '-'),
         # '256 Shots': ('fixed_gamma_shot_256.csv', '^', '#2ca02c', '-'),
         '512 Shots': ('fixed_gamma_shot_512.csv', 'v', '#ff7f0e', '-'),
         '1024 Shots': ('fixed_gamma.csv', 'D', '#9467bd', '-'),
+        '5000 Shots': ('fixed_gamma_shot_5000.csv', 'p', '#8c564b', '-'),
         '10,000 Shots': ('fixed_gamma_shot_10000.csv', 'o', '#1f77b4', '-'),
         # '20,000 Shots': ('fixed_gamma_shot_20000.csv', 's', '#d62728', '--'),
         # '50,000 Shots': ('fixed_gamma_shot_50000.csv', '^', '#2ca02c', '-.'),
