@@ -1,0 +1,2 @@
+dataset,gamma_column,ratio_column,sem_column,model_type,breakpoint,left_model,right_model,transition_model,value_at_break,slope,tail_floor,tail_scale,tail_power,transition_width,r2,rmse
+schedule_gamma_df_group_2.csv,gamma_plot,mean_peak_ratio,sem_peak_ratio,smooth_single_peak_transition,1.024341348705448,linear rise branch,power-law decay branch,logistic blend between branches,0.8032261898161283,0.059337014910265044,0.5800000000000001,0.021969221978647598,0.9721992246254673,0.15083955149554512,0.9648309471740749,0.006314404169777888
