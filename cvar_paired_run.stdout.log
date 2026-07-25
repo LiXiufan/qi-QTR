@@ -334,3 +334,7 @@ CVaR experiment: shots=5000, steps=100, initializations=5, alphas=[0.1, 0.2, 0.3
 [completed] 333/350 ascending alpha=0.50 graph=4 init=2
 [completed] 334/350 ascending alpha=0.50 graph=4 init=3
 [completed] 335/350 ascending alpha=0.50 graph=4 init=4
+[completed] 336/350 ascending alpha=0.65 graph=4 init=0
+[completed] 337/350 ascending alpha=0.65 graph=4 init=1
+[completed] 338/350 ascending alpha=0.65 graph=4 init=2
+[completed] 339/350 ascending alpha=0.65 graph=4 init=3
