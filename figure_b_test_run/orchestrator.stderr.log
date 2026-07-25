@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "E:\李修凡的资料\博四（下）\QTL\qi-QTR\run_figure_b_test.py", line 248, in <module>
+    main()
+  File "E:\李修凡的资料\博四（下）\QTL\qi-QTR\run_figure_b_test.py", line 233, in main
+    regenerate_test_figure(
+  File "E:\李修凡的资料\博四（下）\QTL\qi-QTR\run_figure_b_test.py", line 121, in regenerate_test_figure
+    raise RuntimeError("; ".join(failures))
+RuntimeError: ascending exited with code 1
