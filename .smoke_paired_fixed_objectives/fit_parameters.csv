@@ -1,3 +1,0 @@
-method,model,formula,peak_control_r,peak_value,baseline_value,tail_value,left_curvature,right_curvature,weighted_sse
-CVaR,baseline_peak_tail_anchored_asymmetric_quadratic,R*=peak; R(r)=R*-c_left(r-r*)^2 for r<=r*; R(r)=R*-c_right(r-r*)^2 for r>r*,0.30102999566398114,0.6692698412698412,0.6598126984126984,0.6559746031746032,0.10436152213074991,0.027213164168511668,0.09770158011508075
-QTL,baseline_peak_tail_anchored_asymmetric_quadratic,R*=peak; R(r)=R*-c_left(r-r*)^2 for r<=r*; R(r)=R*-c_right(r-r*)^2 for r>r*,0.30102999566398114,0.6622126984126984,0.6598126984126984,0.6410190476190476,0.0264844950422443,0.04337991499259422,0.006488972094183762

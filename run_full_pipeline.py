@@ -11,6 +11,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
+from experiments import FIGURE_A_FIXED_GAMMAS_BY_SHOTS, FIGURE_B_GAMMAS
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 
@@ -32,14 +34,13 @@ def experiment_commands(
     steps: int,
     number_of_initializations: int,
 ) -> list[tuple[str, list[str]]]:
-    """Build the five independent production experiment commands."""
+    """Build the six independent production experiment commands."""
+    figure_b_dir = output_dir / "figure_b_latest"
     common = [
         "--steps",
         str(steps),
         "--num-init-points",
         str(number_of_initializations),
-        "--output-dir",
-        str(output_dir),
     ]
     return [
         (
@@ -51,13 +52,36 @@ def experiment_commands(
                 "fixed",
                 "--shots",
                 str(shots),
+                "--gammas",
+                ",".join(
+                    f"{gamma:g}"
+                    for gamma in FIGURE_A_FIXED_GAMMAS_BY_SHOTS[shots]
+                ),
                 *common,
+                "--output-dir",
+                str(output_dir),
             ],
         )
         for shots in [1000, 5000, 10000]
     ] + [
         (
-            "ascending_5000",
+            "figure_b_fixed_5000",
+            [
+                sys.executable,
+                "-u",
+                str(SCRIPT_DIR / "run_experiments.py"),
+                "fixed",
+                "--shots",
+                "5000",
+                "--gammas",
+                ",".join(f"{gamma:g}" for gamma in FIGURE_B_GAMMAS),
+                *common,
+                "--output-dir",
+                str(figure_b_dir),
+            ],
+        ),
+        (
+            "figure_b_ascending_5000",
             [
                 sys.executable,
                 "-u",
@@ -66,6 +90,8 @@ def experiment_commands(
                 "--shots",
                 "5000",
                 *common,
+                "--output-dir",
+                str(figure_b_dir),
             ],
         ),
         (
@@ -78,6 +104,8 @@ def experiment_commands(
                 "--shots",
                 "5000",
                 *common,
+                "--output-dir",
+                str(output_dir),
             ],
         ),
     ]
@@ -148,6 +176,14 @@ def wait_for_experiments(
 
 def regenerate_figures(output_dir: Path) -> None:
     """Run all plotting scripts against the newly generated CSVs."""
+    figure_b_dir = output_dir / "figure_b_latest"
+    reference_shape = output_dir / "curve_fitting_poly_tail_summary.csv"
+    if not reference_shape.exists():
+        reference_shape = (
+            SCRIPT_DIR
+            / "data_and_figures"
+            / "curve_fitting_poly_tail_summary.csv"
+        )
     plotting_commands = [
         [
             sys.executable,
@@ -159,7 +195,7 @@ def regenerate_figures(output_dir: Path) -> None:
             "--shot-10000",
             str(output_dir / "fixed_gamma_shot_10000.csv"),
             "--reference-shape-csv",
-            str(output_dir / "curve_fitting_poly_tail_summary.csv"),
+            str(reference_shape),
             "--fit-summary-csv",
             str(output_dir / "fixed_plot_fit_summary.csv"),
             "--output-png",
@@ -171,18 +207,18 @@ def regenerate_figures(output_dir: Path) -> None:
             sys.executable,
             str(SCRIPT_DIR / "ascending_tilt.py"),
             "--fixed-csv",
-            str(output_dir / "fixed_gamma_shot_5000.csv"),
+            str(figure_b_dir / "fixed_gamma_shot_5000.csv"),
             "--ascending-csv",
             str(
-                output_dir
+                figure_b_dir
                 / "schedule_gamma_restart_group(shots5000)all.csv"
             ),
             "--fit-summary-csv",
-            str(output_dir / "schedule_gamma_expquad_fit_summary.csv"),
+            str(figure_b_dir / "large_gamma_fit_summary.csv"),
             "--output-png",
-            str(output_dir / "schedule_gamma_expquad_fit.png"),
+            str(figure_b_dir / "large_gamma_figure_b.png"),
             "--output-pdf",
-            str(output_dir / "schedule_gamma_expquad_fit.pdf"),
+            str(figure_b_dir / "large_gamma_figure_b.pdf"),
         ],
         [
             sys.executable,

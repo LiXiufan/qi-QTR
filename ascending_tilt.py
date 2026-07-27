@@ -20,7 +20,7 @@ from plotting import (
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DATA_DIR = SCRIPT_DIR / "data_and_figures"
+DATA_DIR = SCRIPT_DIR / "figure_b_latest"
 DENSE_POINTS = 800
 PLOT_GAMMA_MAX = 36.0
 
@@ -649,30 +649,29 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--fixed-csv",
         type=Path,
-        default=DATA_DIR / "fixed_gamma_shot_5000.csv",
+        default=DATA_DIR / "fixed_summary.csv",
     )
     parser.add_argument(
         "--ascending-csv",
         type=Path,
         default=(
-            DATA_DIR
-            / "schedule_gamma_restart_group(shots5000)all.csv"
+            DATA_DIR / "ascending_summary.csv"
         ),
     )
     parser.add_argument(
         "--output-png",
         type=Path,
-        default=DATA_DIR / "schedule_gamma_expquad_fit.png",
+        default=DATA_DIR / "large_gamma_figure_b.png",
     )
     parser.add_argument(
         "--output-pdf",
         type=Path,
-        default=DATA_DIR / "schedule_gamma_expquad_fit.pdf",
+        default=DATA_DIR / "large_gamma_figure_b.pdf",
     )
     parser.add_argument(
         "--fit-summary-csv",
         type=Path,
-        default=DATA_DIR / "schedule_gamma_expquad_fit_summary.csv",
+        default=DATA_DIR / "large_gamma_fit_summary.csv",
     )
     parser.add_argument(
         "--log-x",

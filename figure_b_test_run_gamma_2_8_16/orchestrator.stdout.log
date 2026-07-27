@@ -1,1 +1,0 @@
-Figure (b) test configuration: shots=5000, steps=100, initializations=5, workers_per_sweep=1, simulator=lightning.qubit

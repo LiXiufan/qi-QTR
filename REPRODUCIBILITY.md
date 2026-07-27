@@ -1,250 +1,107 @@
-# QTL MaxCut reproducibility information
+# Reproducibility notes
 
-## Architecture and data flow
+## Shared implementation
 
-```text
-max_cut.py ─┐
-            ├─> qtl.py ─> experiments.py ─> run_experiments.py
-qaoa.py ────┘                         │
-                                     ├─> fixed summary CSVs
-                                     ├─> ascending summary CSV
-                                     └─> scale benchmark CSV
+`max_cut.py` constructs seeded MaxCut instances and exact reference cuts.
+`qaoa.py` defines the QAOA ansatz, probability QNodes, and initial parameters.
+`qtl.py` implements a complete optimization run. `experiments.py` performs
+repeated fixed-QTL, ascending-QTL, and scale sweeps. `plotting.py` contains the
+shared validation and plotting utilities.
 
-fixed summary CSVs ─────────────> fixed_tilt.py ─────> Figure (a)
-fixed + ascending summary CSVs ─> ascending_tilt.py ─> Figure (b)
-scale benchmark CSV ────────────> scale_benchmark.py ─> Figure (c)
-```
-
-`qtl.execute_run` is the unit of execution. It accepts a `RunSpec`, initial QAOA
-parameters, and `OptimizationSettings`; it returns the complete iteration
-history and final summary. Optional `history_csv` and `summary_csv` arguments
-write those single-run outputs directly.
-
-`experiments.py` is responsible only for repeating that unit across graph seeds,
-tilt values, depths, and initializations, then aggregating the returned results.
-
-## Compute resources
-
-The code uses PennyLane `default.qubit`. No quantum hardware, GPU, TPU, or paid
-cloud accelerator is required. All reported shot counts are finite simulator
-shot budgets.
-
-`run_experiments.py` also accepts `--simulator lightning.qubit`. This compiled
-backend preserves the circuit, shot count, parameter-shift method, optimizer,
-and explicit device seed while reducing simulator time. It is reproducible
-across repeated runs with the same backend, but its finite-shot samples need not
-be byte-identical to `default.qubit` because the backends use different random
-number implementations. The isolated `run_figure_b_test.py` runner selects
-`lightning.qubit` by default and records the simulator name in `test.csv`.
-
-Parameter-shift differentiation of `2p` QAOA parameters, followed by objective
-and metric evaluation, is recorded as
-
-\[
-\text{circuit evaluations per step}=4p+2.
-\]
-
-Consequently,
-
-\[
-\text{shots per run}=T(4p+2)N_{\mathrm{shot}}.
-\]
-
-With `T=100` and five graph seeds/five initializations:
-
-| Experiment | Runs | Circuit evaluations | Simulator shots |
-|---|---:|---:|---:|
-| Fixed tilt, 1,000 shots, 12 gamma values | 300 | 300,000 | 300,000,000 |
-| Fixed tilt, 5,000 shots, 12 gamma values | 300 | 300,000 | 1,500,000,000 |
-| Fixed tilt, 10,000 shots, 12 gamma values | 300 | 300,000 | 3,000,000,000 |
-| Ascending tilt, 5,000 shots, 13 average gamma values | 325 | 325,000 | 1,625,000,000 |
-| Scale benchmark, 5,000 shots, `p=1` | 225 | 135,000 | 675,000,000 |
-| Scale benchmark, 5,000 shots, `p=2` | 225 | 225,000 | 1,125,000,000 |
-| Scale benchmark, 5,000 shots, `p=3` | 225 | 315,000 | 1,575,000,000 |
-| Full pipeline | 2,000 | 1,900,000 | 9,800,000,000 |
-
-Small smoke tests can be run on a laptop by reducing `--steps`,
-`--num-init-points`, and the gamma list. Full regeneration is intended for a
-multi-core workstation or cluster.
-
-## Common problem construction
-
-- Graph family: connected Erdős–Rényi.
-- Edge probability: `min(0.45, 3/(n-1))`.
-- Graph seeds: `0,1,2,3,4`.
-- Exact maximum cuts: obtained by enumerating all `2^n` bitstrings.
-- QAOA circuit: Hadamard initialization followed by `p` Ising-ZZ cost/RX mixer
-  layers.
-- Gradient method: PennyLane parameter shift.
-- Device seed: `2024 + 100*graph_seed + 10*p + n`.
-
-## Fixed- and ascending-tilt optimizer
-
-Both tilt sweeps call the same `tilt_optimization_settings` function and use:
+All finite-shot QTL sweeps use PennyLane parameter-shift differentiation.
+Fixed and ascending QTL use identical initial parameter vectors and this
+optimizer:
 
 | Setting | Value |
 |---|---:|
-| Steps | 100 |
-| Base learning rate | 0.18 |
-| Decay power | 0.35 |
-| Decay offset | 6.0 |
+| learning rate | 0.18 |
+| decay power | 0.35 |
+| decay offset | 6.0 |
 | Polyak momentum | 0.70 |
-| Tilt learning-rate penalty | 0.01 |
-| Gradient clip | 2.5 |
-| Tail window | 10 |
+| tilt learning-rate penalty | 0.01 |
+| gradient clipping | 2.5 |
 
-The effective learning rate is
+At step `t`, the learning rate is
 
-\[
-\eta_t =
-\frac{0.18}
-{(t+1+6)^{0.35}(1+0.01|\gamma_t|)}.
-\]
+```text
+0.18 / (t + 1 + 6)^0.35 / (1 + 0.01 * |gamma_t|)
+```
 
-These are the original ascending-gamma optimizer settings. The fixed-gamma
-sweep now uses the same profile so optimizer differences cannot confound the
-comparison.
+The shared initialization base seed is `20260429`.
 
-## Experiment specifications
+## Figures (a)-(c)
 
-### Figure (a): fixed tilt
+Figure (a) uses `n=8`, QAOA depth `p=2`, five graph seeds, five
+initializations, 100 steps, shot budgets 1,000/5,000/10,000, and the core
+fixed-gamma values `0, 0.25, 0.4, 0.5, 0.6, 0.75, 1, 1.5, 2, 2.5, 3, 4`.
+The included 1,000- and 10,000-shot summaries also retain gamma 5 and 6 as
+tail anchors; the 5,000-shot summary ends at gamma 4. Its shifted
+exponential-quadratic matching targets are retained in
+`data_and_figures/curve_fitting_poly_tail_summary.csv`.
 
-- `n=8`, `p=2`.
-- Gamma values:
-  `0,0.25,0.4,0.5,0.6,0.75,1,1.5,2,2.5,3,4`.
-- Shot budgets: `1000,5000,10000`.
-- Shared tilt initialization base seed: `20260429`.
-- Five initial parameters per graph and gamma, drawn uniformly from `[0,2pi)`.
-- Gamma zero is evaluated as the expectation objective.
+Figure (b) uses `n=8`, `p=2`, 5,000 shots, five graph seeds, five
+initializations, and 100 steps. For a requested average gamma `g`, the
+ascending schedule is
 
-### Figure (b): ascending tilt
+```text
+gamma_t = 2 * g * t / T,  t = 0, ..., T - 1
+```
 
-- `n=8`, `p=2`, 5,000 shots.
-- Requested average gamma values:
-  `0,0.2,0.4,0.6,0.8,1,1.2,1.4,1.6,2,2.5,3,4`.
-- Shared tilt initialization base seed: `20260429`.
-- Five initial parameters per graph and requested average, drawn uniformly from
-  `[0,2pi)`.
+The CSV records both requested and realized averages. The latest combined
+summary is `figure_b_latest/large_gamma.csv`; the separately loadable series
+are `fixed_summary.csv` and `ascending_summary.csv`. The matching model is a
+peak-anchored asymmetric rise followed by exponential-plus-linear decay.
 
-Fixed and ascending sweeps obtain these points from the same
-`build_tilt_initial_points` helper. Thus initialization ID `i` uses the same
-seed and exact parameter vector in both datasets, enabling paired comparison.
+Figure (c) uses sizes `n=8,10,12`, depths `p=1,2,3`, 5,000 shots, five graph
+seeds, and five initializations. It compares expectation, fixed QTL at
+`gamma=0.4`, and ascending QTL with a `0 -> 0.8` linear schedule.
 
-For requested average gamma `g`, the ascending schedule retains a linear ramp:
+For the QTL panels, aggregation first averages initializations within each
+graph and then averages graph-level values. SEM is the sample standard
+deviation across graphs divided by the square root of the graph count.
 
-\[
-\gamma_t = \frac{2g\,t}{T},\qquad t=0,\ldots,T-1.
-\]
+## Strictly paired fixed CVaR versus fixed QTL
 
-The discrete average is `g(T-1)/T`, which approaches `g`. For the example
-`g=4,T=4`, the applied values are `0,2,4,6`; for the production `T=100` run,
-their average is `3.96`. Ascending summaries explicitly include
-`gamma_average_requested`, `gamma_average_realized`, `gamma_end_exclusive`,
-and `gamma_last`.
+The retained production run is in `paired_fixed_cvar_qtl_5000/`.
 
-### Figure (c): scale benchmark
-
-- Sizes: `n=8,10,12`.
-- QAOA depths: `p=1,2,3`.
-- Shot budget: 5,000.
+- `n=8`, `p=2`, 5,000 shots, 100 steps.
 - Five graph seeds and five initializations.
-- Objectives:
-  - expectation;
-  - fixed QTL with `gamma=0.4`;
-  - ascending QTL with a linear `0 -> 0.8` schedule.
-- Base learning rate: `0.12`; other decay, momentum, penalty, and clipping
-  settings match the common tilt optimizer.
+- Alpha values: `1, 0.8, 0.65, 0.5, 0.35, 0.2, 0.1`.
+- Matched gamma values follow the coordinate recorded in
+  `parameter_pairs.csv`, with `gamma_max=4`.
+- Each CVaR/QTL pair has the same graph, initialization, device seed,
+  optimizer implementation, and shot budget.
+- `alpha=1` and `gamma=0` are an exact expectation-objective control.
+- The production backend recorded in `experiment_metadata.json` is
+  `lightning.qubit`.
 
-## Aggregation
+The runner path and runner SHA-256 inside `experiment_metadata.json` record the
+exact production runner in the parent archive. The curated runner adds only a
+plot-only entry point, so its current source hash is intentionally different.
 
-For each graph/objective setting:
+`paired_restart_results.csv` and `paired_iteration_history.csv` retain every
+restart and iteration. `paired_graph_averages.csv`, `paired_summary.csv`, and
+`paired_differences.csv` retain the aggregation and paired contrasts.
 
-1. Average the five initialization results.
-2. Aggregate those graph-level averages across five graph seeds.
-3. Calculate SEM as the sample standard deviation divided by the square root of
-   the number of graphs.
+## Parameter-shift versus finite difference
 
-Fixed and ascending summaries contain:
+The self-describing
+`parameter_shift_rule_comparison/parameter_shift_comparison.csv` records:
 
-```text
-gamma_plot
-mean_peak_ratio, sem_peak_ratio
-mean_tail_ratio, sem_tail_ratio
-mean_final_ratio, sem_final_ratio
-mean_optimal_mass
-```
+- one seeded 6-vertex 3-regular graph (`graph_seed=17`);
+- QAOA depth 2 and QTL gamma 2;
+- 2,000 shots per circuit evaluation;
+- 60 Adam updates with learning rate 0.08;
+- central finite-difference step 0.05;
+- the same initial vector and optimizer for both methods;
+- an analytic parameter-shift L-BFGS-B reference optimum.
 
-Ascending summaries additionally contain:
+Because each QAOA angle is shared by multiple gates, the parameter-shift code
+differentiates the gate-level probability vector and then applies the analytic
+QTL chain rule. The parameter-error figure uses distance to the closest
+symmetry-equivalent reference vector.
 
-```text
-gamma_average_requested, gamma_average_realized
-gamma_start, gamma_end_exclusive, gamma_last
-```
+## Artifact integrity
 
-The scale plotting input has one graph-level row per
-`n, p, seed, objective`. `scale_benchmark.py` performs the final mean and SEM
-aggregation.
-
-## Plotting policy
-
-The figure files contain no optimization code.
-
-- Figure (a) uses the original multi-start robust least-squares matching
-  procedure with the shifted exponential-quadratic model
-  `d + (a + b*x) exp(-c*x^2)`. Its peak, derivative, curvature, and tail
-  constraints are matched to `curve_fitting_poly_tail_summary.csv`.
-- Figure (b) fits both series directly from the regenerated data with the same
-  robust SEM-weighted cubic model
-  `a0 + a1*x + a2*x^2 + a3*x^3`.
-- Figure (b) uses `mean_final_ratio` and `sem_final_ratio` for both series, in
-  agreement with its y-axis label.
-- Figure (b)'s x-axis reports the requested average gamma for ascending
-  schedules, not the last applied gamma.
-- Figure (a) uses the original solid/dashed/dash-dot line styles, markers,
-  colors, framed legend, and fixed axis range.
-- Figure (b) uses the original dashed-blue/solid-orange styles and an RMS SEM
-  band of constant width around each matched curve.
-- Figure (c) uses the original layered difference bars and colored value
-  markers.
-- Figures (a) and (b) are written as 600-DPI PNGs; Figure (c) is written at
-  300 DPI. Every panel also has a vector PDF.
-
-`data_and_figures/curve_fitting_poly_tail_summary.csv` supplies Figure (a)'s
-reference matching targets. Regeneration also writes
-`data_and_figures/fixed_plot_fit_summary.csv` with the resulting display-model
-parameters and `data_and_figures/schedule_gamma_expquad_fit_summary.csv` with
-the Figure (b) model parameters.
-
-## Exact commands
-
-From the package root:
-
-```bash
-python -m pip install -r requirements.txt
-python -m py_compile max_cut.py qaoa.py qtl.py experiments.py run_experiments.py tune_ascending_optimizer.py plotting.py fixed_tilt.py ascending_tilt.py scale_benchmark.py
-mkdir -p results
-```
-
-Re-run optimizer selection:
-
-```bash
-python tune_ascending_optimizer.py
-```
-
-Regenerate data:
-
-```bash
-python run_experiments.py fixed --shots 1000 --output-dir results
-python run_experiments.py fixed --shots 5000 --output-dir results
-python run_experiments.py fixed --shots 10000 --output-dir results
-python run_experiments.py ascending --shots 5000 --output-dir results
-python run_experiments.py scale --shots 5000 --output-dir results
-```
-
-Regenerate the included figures without rerunning experiments:
-
-```bash
-python fixed_tilt.py
-python ascending_tilt.py
-python scale_benchmark.py
-```
+`SHA256SUMS.csv` lists SHA-256 hashes and sizes for the curated artifacts. It is
+generated after validation and excludes itself.

@@ -1,196 +1,107 @@
-# QTL MaxCut code submission
+# Curated QTL MaxCut project
 
-This package contains the experiment code, aggregated CSV data, and rendered
-figures for the QTL MaxCut study. The implementation is separated by scientific
-responsibility: MaxCut, QAOA, QTL optimization, experiment sweeps, and plotting.
+This folder is a self-contained, curated copy of the requested work. The
+original parent project was not deleted or modified. Historical smoke tests,
+superseded CVaR runs, early Figure (b) tests, IDE files, caches, and the virtual
+environment are intentionally excluded.
 
-## Code structure
+## Retained results
 
-| File | Responsibility |
-|---|---|
-| `max_cut.py` | Graph generation, exact MaxCut enumeration, and distribution metrics. |
-| `qaoa.py` | QAOA circuit ansatz, finite-shot QNode construction, and parameter initialization. |
-| `qtl.py` | QTL objectives, optimizer settings, one complete optimization run, and optional per-run CSV output. |
-| `experiments.py` | Fixed-tilt, ascending-tilt, and scale sweeps plus cross-run aggregation. |
-| `run_experiments.py` | Command-line interface for the experiment sweeps. |
-| `tune_ascending_optimizer.py` | Reproducible ascending-gamma optimizer screening and ranking. |
-| `plotting.py` | Shared CSV validation, interpolation, style, and figure-saving helpers. |
-| `fixed_tilt.py` | CSV-to-Figure (a) plotting function. |
-| `ascending_tilt.py` | CSV-to-Figure (b) plotting function. |
-| `scale_benchmark.py` | CSV-to-Figure (c) plotting function. |
-| `data_and_figures/` | Included aggregate data and PNG/PDF figure outputs. |
+| Study | Code | Included data and figures |
+|---|---|---|
+| Figure (a), fixed QTL | `fixed_tilt.py` | `data_and_figures/fixed_*` |
+| Figure (b), fixed versus ascending QTL | `ascending_tilt.py`, `run_figure_b_incremental.py` | `figure_b_latest/` |
+| Figure (c), scale benchmark | `scale_benchmark.py` | `data_and_figures/maxcut_*` |
+| Fixed-alpha CVaR versus matched fixed-gamma QTL | `paired_fixed_cvar_qtl.py` | `paired_fixed_cvar_qtl_5000/` |
+| Parameter shift versus finite difference | `parameter_shift_rule_comparison/parameter_shift_comparison.py` | the CSV and four figures in the same directory |
 
-## Shared optimizer
+The retained Figure (b) is the newest expanded result. It contains 18 fixed
+and 18 ascending points at
+`0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 2, 3, 4, 8, 10, 16, 24, 36, 50`.
+The published views show the requested range `0 <= gamma <= 36`; the gamma-50
+rows remain in the CSV as tail-fit provenance. Both the linear and
+zero-preserving logarithmic views are included. The two source runs and their
+logs are under `figure_b_latest/raw_runs/`.
 
-The fixed- and ascending-tilt experiments use exactly the same optimizer:
-
-```text
-learning rate                    0.18
-learning-rate decay power        0.35
-learning-rate decay offset       6.0
-Polyak momentum                  0.70
-tilt learning-rate penalty       0.01
-gradient clipping threshold      2.5
-```
-
-At optimization step `t`, the effective learning rate is
+The retained CVaR/QTL study is the newest strictly paired 5,000-shot result:
+350 tasks formed from two objectives, seven matched control values, five
+graphs, and five identical initializations. Its shared coordinate is
 
 ```text
-0.18 / (t + 1 + 6)^0.35 / (1 + 0.01 |gamma_t|).
+r = -ln(alpha) / ln(1 / alpha_min) = |gamma| / gamma_max
 ```
 
-Both experiment functions construct their settings through
-`experiments.tilt_optimization_settings`; there are no separate fixed and
-ascending optimizer dictionaries.
+This mapping is a comparison coordinate, not a claim that CVaR and QTL are
+physically equivalent. `performance_matching_function.*` contains the two
+independently fitted response functions.
 
-The fixed- and ascending-tilt sweeps also call the same
-`experiments.build_tilt_initial_points` helper. Consequently, every paired
-graph/initialization uses the identical seed and initial QAOA parameter vector
-in both sweeps. The shared base seed is `20260429`, and parameters are sampled
-from `[0, 2*pi)`.
-
-The shared optimizer is the original ascending-gamma profile. It is now also
-used by the fixed-gamma sweep to keep the comparison controlled.
-
-## Ascending-gamma convention
-
-Ascending inputs and the Figure (b) x-axis denote the requested average gamma,
-not the last gamma. The original linear ramp is retained. For `T` steps and a
-requested average `g`, step `t=0,...,T-1` uses
-
-```text
-gamma_t = 2 * g * t / T.
-```
-
-Thus `g=4` with four steps produces `0,2,4,6`, whose discrete average is `3`;
-with 100 steps the realized average is `3.96`, approaching the requested value
-`4`. The ascending CSV records the requested average, realized average,
-exclusive endpoint, and last applied gamma explicitly.
-
-## Environment setup
+## Setup
 
 Python 3.11 or newer is recommended.
 
-```bash
-python3.11 -m venv .venv
-source .venv/bin/activate
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-Compile all source files:
+## Regenerate all retained figures from included CSVs
 
-```bash
-python -m py_compile max_cut.py qaoa.py qtl.py experiments.py run_experiments.py tune_ascending_optimizer.py plotting.py fixed_tilt.py ascending_tilt.py scale_benchmark.py
+This command performs plotting and curve fitting only; it does not rerun the
+expensive simulations:
+
+```powershell
+python regenerate_all_figures.py
+python validate_package.py
 ```
 
-Re-run the optimizer screen:
+Individual plot-only commands are:
 
-```bash
-python tune_ascending_optimizer.py
-```
-
-## Reproduce figures from included CSVs
-
-The plotting functions are deliberately data-only and do not run an optimizer:
-
-```bash
+```powershell
 python fixed_tilt.py
 python ascending_tilt.py
+python ascending_tilt.py --log-x `
+  --output-png figure_b_latest/large_gamma_figure_b_log.png `
+  --output-pdf figure_b_latest/large_gamma_figure_b_log.pdf
 python scale_benchmark.py
+python paired_fixed_cvar_qtl.py --plot-only
+python parameter_shift_rule_comparison/parameter_shift_comparison.py --plot-only
 ```
 
-By default they read and update the corresponding files in
-`data_and_figures/`. Custom paths are available through `--help`.
+## Regenerate simulation data
 
-## Regenerate experiment data
+Figure (a) uses its original 12-point grid. Figure (b) has a separate expanded
+grid, preventing one panel's defaults from silently changing the other.
 
-Create a separate result directory:
+```powershell
+# Figure (a); the 1,000/10,000-shot files retain gamma=5,6 tail anchors
+python run_experiments.py fixed --shots 1000 `
+  --gammas "0,0.25,0.4,0.5,0.6,0.75,1,1.5,2,2.5,3,4,5,6" `
+  --output-dir data_and_figures
+python run_experiments.py fixed --shots 5000 --output-dir data_and_figures
+python run_experiments.py fixed --shots 10000 `
+  --gammas "0,0.25,0.4,0.5,0.6,0.75,1,1.5,2,2.5,3,4,5,6" `
+  --output-dir data_and_figures
 
-```bash
-mkdir -p results
+# Figure (b), fixed and ascending with a shared grid and initializations
+python run_figure_b_incremental.py `
+  --gammas "0,0.2,0.4,0.6,0.8,1,1.2,1.4,1.6,2,3,4,8,10,16,24,36,50"
+
+# Figure (c)
+python run_experiments.py scale --shots 5000 --output-dir data_and_figures
+
+# Strictly paired fixed-alpha CVaR versus fixed-gamma QTL
+python paired_fixed_cvar_qtl.py
+
+# Parameter-shift versus finite-difference comparison
+python parameter_shift_rule_comparison/parameter_shift_comparison.py
 ```
 
-Fixed tilt, Figure (a):
+These production simulations are computationally expensive. Use the CLI
+options for fewer shots, steps, initializations, or gamma values for smoke
+tests. `run_full_pipeline.py` runs the QTL data jobs concurrently and keeps the
+Figure (a) and Figure (b) fixed-gamma outputs in separate locations.
 
-```bash
-python run_experiments.py fixed --shots 1000 --output-dir results
-python run_experiments.py fixed --shots 5000 --output-dir results
-python run_experiments.py fixed --shots 10000 --output-dir results
-```
-
-Ascending tilt, Figure (b):
-
-```bash
-python run_experiments.py ascending --shots 5000 --output-dir results
-```
-
-Use the installed compiled simulator and independent process workers for a
-faster finite-shot run:
-
-```bash
-python run_experiments.py ascending \
-  --shots 5000 \
-  --workers 2 \
-  --simulator lightning.qubit \
-  --output-dir results
-```
-
-`default.qubit` remains the command-line default for exact backend provenance.
-On the packaged environment, a representative 5,000-shot benchmark was about
-3.1 times faster with `lightning.qubit`. Backend random-number implementations
-differ, so individual finite-shot samples are not byte-identical, although the
-circuit, shot budget, gradient method, optimizer, and seeds are unchanged.
-
-Generate isolated Figure (b) test artifacts with two workers per sweep:
-
-```bash
-python run_figure_b_test.py
-```
-
-This writes `test.csv`, `test.png`, `test.pdf`, and `test_fit_summary.csv`
-without replacing the reported artifacts. For a substantially smaller
-screening workload, use `python run_figure_b_test.py --fast`; that preset uses
-1,000 shots, 40 steps, and three initializations and therefore is not the full
-experiment.
-
-Scale benchmark, Figure (c):
-
-```bash
-python run_experiments.py scale --shots 5000 --output-dir results
-```
-
-Run the complete pipeline:
-
-```bash
-python run_full_pipeline.py --output-dir results
-```
-
-This launches the five independent experiment families concurrently and
-regenerates all three figures only if every data job succeeds. Per-experiment
-logs and a final status manifest are written to `full_run_logs/`.
-
-## Plot regenerated CSVs
-
-```bash
-python fixed_tilt.py \
-  --shot-1000 results/fixed_gamma_shot_1000.csv \
-  --shot-5000 results/fixed_gamma_shot_5000.csv \
-  --shot-10000 results/fixed_gamma_shot_10000.csv \
-  --output-png results/fixed_plot_results.png \
-  --output-pdf results/fixed_plot_results.pdf
-
-python ascending_tilt.py \
-  --fixed-csv results/fixed_gamma_shot_5000.csv \
-  --ascending-csv "results/schedule_gamma_restart_group(shots5000)all.csv" \
-  --output-png results/schedule_gamma_expquad_fit.png \
-  --output-pdf results/schedule_gamma_expquad_fit.pdf
-
-python scale_benchmark.py \
-  --data-csv results/maxcut_compare_avg_shot5000.csv \
-  --output-png results/maxcut_mean_optimal_mass_plot.png \
-  --output-pdf results/maxcut_mean_optimal_mass_plot.pdf
-```
-
-See `REPRODUCIBILITY.md` for seeds, aggregation rules, objectives, and compute
-accounting.
+See `REPRODUCIBILITY.md` for the numerical specifications and `CONTENTS.md` for
+the retained-file policy.

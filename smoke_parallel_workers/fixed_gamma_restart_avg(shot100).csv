@@ -1,6 +1,0 @@
-graph_family,n,p,seed,gamma_plot,gamma_raw,num_init_points,final_mean_ratio,tail_mean_ratio,peak_mean_ratio,final_optimal_mass
-erdos_renyi,8,2,0,0.0,0.0,1,0.6142857142857144,0.5814285714285715,0.6142857142857144,0.03
-erdos_renyi,8,2,1,0.0,0.0,1,0.618,0.6005,0.618,0.01
-erdos_renyi,8,2,2,0.0,0.0,1,0.529,0.5065,0.529,0.01
-erdos_renyi,8,2,3,0.0,0.0,1,0.5722222222222223,0.538888888888889,0.5722222222222223,0.0
-erdos_renyi,8,2,4,0.0,0.0,1,0.732,0.6675,0.732,0.05

@@ -1103,6 +1103,68 @@ def run_experiment(
     )
 
 
+def regenerate_figures_from_results(output_dir: Path) -> None:
+    """Regenerate all paired-comparison figures from the saved summary CSV."""
+    output_dir = Path(output_dir).resolve()
+    summary_path = output_dir / "paired_summary.csv"
+    if not summary_path.exists():
+        raise FileNotFoundError(f"Missing paired summary: {summary_path}")
+    summary = pd.read_csv(summary_path)
+    required = {
+        "method",
+        "control_r",
+        "alpha",
+        "one_minus_alpha",
+        "gamma",
+        "mean_final_ratio",
+        "sem_final_ratio",
+    }
+    missing = sorted(required.difference(summary.columns))
+    if missing:
+        raise ValueError(
+            f"{summary_path} is missing required columns: {missing}"
+        )
+    fits = {
+        method: fit_landscape_response(
+            summary.loc[summary["method"] == method]
+        )
+        for method in ("CVaR", "QTL")
+    }
+    pd.DataFrame(
+        [{"method": method, **fit} for method, fit in fits.items()]
+    ).to_csv(output_dir / "fit_parameters.csv", index=False)
+    plot_single_method(
+        summary,
+        method="CVaR",
+        x_column="one_minus_alpha",
+        x_label=r"CVaR control strength $1-\alpha$",
+        output_jpg=output_dir / "fixed_CVaR.jpg",
+        output_pdf=output_dir / "fixed_CVaR.pdf",
+    )
+    plot_single_method(
+        summary,
+        method="QTL",
+        x_column="gamma",
+        x_label=r"Tilt parameter $|\gamma|$",
+        output_jpg=output_dir / "fixed_QTL.jpg",
+        output_pdf=output_dir / "fixed_QTL.pdf",
+    )
+    plot_paired_performance(
+        summary,
+        output_dir / "paired_performance.jpg",
+        output_dir / "paired_performance.pdf",
+    )
+    plot_matching_functions(
+        summary,
+        fits,
+        alpha_min=float(summary["alpha"].min()),
+        gamma_max=float(summary["gamma"].abs().max()),
+        output_jpg=output_dir / "performance_matching_function.jpg",
+        output_pdf=output_dir / "performance_matching_function.pdf",
+    )
+    print(f"Regenerated paired-comparison figures in {output_dir}", flush=True)
+
+
 def parse_float_list(value: str) -> tuple[float, ...]:
     """Parse a comma-separated alpha grid."""
     return tuple(
@@ -1136,6 +1198,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument(
+        "--plot-only",
+        action="store_true",
+        help="Regenerate figures from paired_summary.csv without simulation.",
+    )
+    parser.add_argument(
         "--no-resume",
         action="store_true",
         help="Ignore compatible partial CSV checkpoints.",
@@ -1146,6 +1213,9 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     """Run the paired experiment from command-line arguments."""
     arguments = build_parser().parse_args()
+    if arguments.plot_only:
+        regenerate_figures_from_results(arguments.output_dir)
+        return
     settings = PairedSettings(
         shots=arguments.shots,
         steps=arguments.steps,

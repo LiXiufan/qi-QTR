@@ -191,37 +191,41 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--work-dir",
         type=Path,
-        default=SCRIPT_DIR / "figure_b_incremental_run",
+        default=SCRIPT_DIR / "figure_b_latest" / "raw_runs" / "incremental",
     )
     parser.add_argument(
         "--combined-csv",
         type=Path,
-        default=SCRIPT_DIR / "large_gamma.csv",
+        default=SCRIPT_DIR / "figure_b_latest" / "large_gamma.csv",
     )
     parser.add_argument(
         "--output-png",
         type=Path,
-        default=SCRIPT_DIR / "large_gamma_figure_b.png",
+        default=SCRIPT_DIR / "figure_b_latest" / "large_gamma_figure_b.png",
     )
     parser.add_argument(
         "--output-pdf",
         type=Path,
-        default=SCRIPT_DIR / "large_gamma_figure_b.pdf",
+        default=SCRIPT_DIR / "figure_b_latest" / "large_gamma_figure_b.pdf",
     )
     parser.add_argument(
         "--output-log-png",
         type=Path,
-        default=SCRIPT_DIR / "large_gamma_figure_b_log.png",
+        default=(
+            SCRIPT_DIR / "figure_b_latest" / "large_gamma_figure_b_log.png"
+        ),
     )
     parser.add_argument(
         "--output-log-pdf",
         type=Path,
-        default=SCRIPT_DIR / "large_gamma_figure_b_log.pdf",
+        default=(
+            SCRIPT_DIR / "figure_b_latest" / "large_gamma_figure_b_log.pdf"
+        ),
     )
     parser.add_argument(
         "--fit-summary-csv",
         type=Path,
-        default=SCRIPT_DIR / "large_gamma_fit_summary.csv",
+        default=SCRIPT_DIR / "figure_b_latest" / "large_gamma_fit_summary.csv",
     )
     parser.add_argument("--shots", type=int, default=5000)
     parser.add_argument("--steps", type=int, default=100)

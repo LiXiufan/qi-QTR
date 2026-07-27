@@ -23,36 +23,26 @@ from qtl import (
 
 DEFAULT_GRAPH_FAMILIES = ["erdos_renyi"]
 DEFAULT_GRAPH_SEEDS = [0, 1, 2, 3, 4]
-# DEFAULT_FIXED_GAMMAS = [
-#     0.0,
-#     0.25,
-#     0.4,
-#     0.5,
-#     0.6,
-#     0.75,
-#     1.0,
-#     1.5,
-#     2.0,
-#     2.5,
-#     3.0,
-#     4.0,
-# ]
-# DEFAULT_ASCENDING_AVERAGE_GAMMAS = [
-#     0.0,
-#     0.2,
-#     0.4,
-#     0.6,
-#     0.8,
-#     1.0,
-#     1.2,
-#     1.4,
-#     1.6,
-#     2.0,
-#     2.5,
-#     3.0,
-#     4.0,
-# ]
-DEFAULT_FIXED_GAMMAS = [
+FIGURE_A_CORE_GAMMAS = [
+    0.0,
+    0.25,
+    0.4,
+    0.5,
+    0.6,
+    0.75,
+    1.0,
+    1.5,
+    2.0,
+    2.5,
+    3.0,
+    4.0,
+]
+FIGURE_A_FIXED_GAMMAS_BY_SHOTS = {
+    1000: [*FIGURE_A_CORE_GAMMAS, 5.0, 6.0],
+    5000: FIGURE_A_CORE_GAMMAS,
+    10000: [*FIGURE_A_CORE_GAMMAS, 5.0, 6.0],
+}
+FIGURE_B_GAMMAS = [
     0.0,
     0.2,
     0.4,
@@ -72,26 +62,11 @@ DEFAULT_FIXED_GAMMAS = [
     36.0,
     50.0,
 ]
-DEFAULT_ASCENDING_AVERAGE_GAMMAS = [
-    0.0,
-    0.2,
-    0.4,
-    0.6,
-    0.8,
-    1.0,
-    1.2,
-    1.4,
-    1.6,
-    2.0,
-    3.0,
-    4.0,
-    8.0,
-    10.0,
-    16.0,
-    24.0,
-    36.0,
-    50.0,
-]
+# Keep the historical public names, but make their panel-specific meaning
+# explicit. Figure (b)'s fixed sweep must be requested with FIGURE_B_GAMMAS;
+# it must not silently replace Figure (a)'s original fixed-gamma design.
+DEFAULT_FIXED_GAMMAS = FIGURE_A_CORE_GAMMAS
+DEFAULT_ASCENDING_AVERAGE_GAMMAS = FIGURE_B_GAMMAS
 # Backward-compatible alias. Values now denote schedule averages, not final
 # endpoints; use DEFAULT_ASCENDING_AVERAGE_GAMMAS in new code.
 DEFAULT_ASCENDING_FINAL_GAMMAS = DEFAULT_ASCENDING_AVERAGE_GAMMAS

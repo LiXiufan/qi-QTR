@@ -940,6 +940,34 @@ def run_comparison(
     return results
 
 
+def regenerate_figures_from_csv(
+    csv_path: Path = DEFAULT_CSV,
+    png_path: Path = DEFAULT_PNG,
+    pdf_path: Path = DEFAULT_PDF,
+    error_png_path: Path = DEFAULT_ERROR_PNG,
+    error_pdf_path: Path = DEFAULT_ERROR_PDF,
+) -> None:
+    """Regenerate both comparison figures from the self-describing CSV."""
+    csv_path = Path(csv_path)
+    if not csv_path.exists():
+        raise FileNotFoundError(f"Missing comparison data: {csv_path}")
+    results = pd.read_csv(csv_path)
+    required = {
+        "record_type",
+        "method",
+        "iteration",
+        "loss",
+        "mean_final_ratio",
+        "parameter_error_l2",
+    }
+    missing = sorted(required.difference(results.columns))
+    if missing:
+        raise ValueError(f"{csv_path} is missing required columns: {missing}")
+    plot_comparison(results, png_path, pdf_path)
+    plot_parameter_error(results, error_png_path, error_pdf_path)
+    print(f"Regenerated gradient-comparison figures from {csv_path}", flush=True)
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Create the command-line interface."""
     parser = argparse.ArgumentParser(
@@ -1009,6 +1037,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Maximum analytic L-BFGS-B iterations for the reference optimum.",
     )
     parser.add_argument("--csv", type=Path, default=DEFAULT_CSV)
+    parser.add_argument(
+        "--plot-only",
+        action="store_true",
+        help="Regenerate both figures from --csv without optimization.",
+    )
     parser.add_argument("--png", type=Path, default=DEFAULT_PNG)
     parser.add_argument("--pdf", type=Path, default=DEFAULT_PDF)
     parser.add_argument(
@@ -1027,6 +1060,15 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     """Run the command-line comparison."""
     arguments = build_parser().parse_args()
+    if arguments.plot_only:
+        regenerate_figures_from_csv(
+            csv_path=arguments.csv,
+            png_path=arguments.png,
+            pdf_path=arguments.pdf,
+            error_png_path=arguments.error_png,
+            error_pdf_path=arguments.error_pdf,
+        )
+        return
     settings = ComparisonSettings(
         n=arguments.n,
         graph_family=arguments.graph_family,
