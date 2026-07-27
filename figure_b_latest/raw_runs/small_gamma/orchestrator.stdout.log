@@ -1,0 +1,4 @@
+Incremental Figure (b) configuration: gammas=[0.2, 0.4, 0.6, 0.8, 1.2, 1.4, 1.6], shots=5000, steps=100, initializations=5, workers_per_sweep=1, simulator=lightning.qubit
+Saved expanded Figure (b) data: E:\李修凡的资料\博四（下）\QTL\qi-QTR\large_gamma.csv
+Saved linear Figure (b): E:\李修凡的资料\博四（下）\QTL\qi-QTR\large_gamma_figure_b.png
+Saved log-x Figure (b): E:\李修凡的资料\博四（下）\QTL\qi-QTR\large_gamma_figure_b_log.png

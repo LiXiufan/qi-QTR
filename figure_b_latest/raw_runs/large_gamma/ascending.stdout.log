@@ -1,0 +1,551 @@
+[ascending] shots=5000 seed=0 gamma_avg=0.00 init=0
+[completed] 1/275
+[ascending] shots=5000 seed=0 gamma_avg=0.00 init=1
+[completed] 2/275
+[ascending] shots=5000 seed=0 gamma_avg=0.00 init=2
+[completed] 3/275
+[ascending] shots=5000 seed=0 gamma_avg=0.00 init=3
+[completed] 4/275
+[ascending] shots=5000 seed=0 gamma_avg=0.00 init=4
+[completed] 5/275
+[ascending] shots=5000 seed=0 gamma_avg=1.00 init=0
+[completed] 6/275
+[ascending] shots=5000 seed=0 gamma_avg=1.00 init=1
+[completed] 7/275
+[ascending] shots=5000 seed=0 gamma_avg=1.00 init=2
+[completed] 8/275
+[ascending] shots=5000 seed=0 gamma_avg=1.00 init=3
+[completed] 9/275
+[ascending] shots=5000 seed=0 gamma_avg=1.00 init=4
+[completed] 10/275
+[ascending] shots=5000 seed=0 gamma_avg=2.00 init=0
+[completed] 11/275
+[ascending] shots=5000 seed=0 gamma_avg=2.00 init=1
+[completed] 12/275
+[ascending] shots=5000 seed=0 gamma_avg=2.00 init=2
+[completed] 13/275
+[ascending] shots=5000 seed=0 gamma_avg=2.00 init=3
+[completed] 14/275
+[ascending] shots=5000 seed=0 gamma_avg=2.00 init=4
+[completed] 15/275
+[ascending] shots=5000 seed=0 gamma_avg=3.00 init=0
+[completed] 16/275
+[ascending] shots=5000 seed=0 gamma_avg=3.00 init=1
+[completed] 17/275
+[ascending] shots=5000 seed=0 gamma_avg=3.00 init=2
+[completed] 18/275
+[ascending] shots=5000 seed=0 gamma_avg=3.00 init=3
+[completed] 19/275
+[ascending] shots=5000 seed=0 gamma_avg=3.00 init=4
+[completed] 20/275
+[ascending] shots=5000 seed=0 gamma_avg=4.00 init=0
+[completed] 21/275
+[ascending] shots=5000 seed=0 gamma_avg=4.00 init=1
+[completed] 22/275
+[ascending] shots=5000 seed=0 gamma_avg=4.00 init=2
+[completed] 23/275
+[ascending] shots=5000 seed=0 gamma_avg=4.00 init=3
+[completed] 24/275
+[ascending] shots=5000 seed=0 gamma_avg=4.00 init=4
+[completed] 25/275
+[ascending] shots=5000 seed=0 gamma_avg=8.00 init=0
+[completed] 26/275
+[ascending] shots=5000 seed=0 gamma_avg=8.00 init=1
+[completed] 27/275
+[ascending] shots=5000 seed=0 gamma_avg=8.00 init=2
+[completed] 28/275
+[ascending] shots=5000 seed=0 gamma_avg=8.00 init=3
+[completed] 29/275
+[ascending] shots=5000 seed=0 gamma_avg=8.00 init=4
+[completed] 30/275
+[ascending] shots=5000 seed=0 gamma_avg=10.00 init=0
+[completed] 31/275
+[ascending] shots=5000 seed=0 gamma_avg=10.00 init=1
+[completed] 32/275
+[ascending] shots=5000 seed=0 gamma_avg=10.00 init=2
+[completed] 33/275
+[ascending] shots=5000 seed=0 gamma_avg=10.00 init=3
+[completed] 34/275
+[ascending] shots=5000 seed=0 gamma_avg=10.00 init=4
+[completed] 35/275
+[ascending] shots=5000 seed=0 gamma_avg=16.00 init=0
+[completed] 36/275
+[ascending] shots=5000 seed=0 gamma_avg=16.00 init=1
+[completed] 37/275
+[ascending] shots=5000 seed=0 gamma_avg=16.00 init=2
+[completed] 38/275
+[ascending] shots=5000 seed=0 gamma_avg=16.00 init=3
+[completed] 39/275
+[ascending] shots=5000 seed=0 gamma_avg=16.00 init=4
+[completed] 40/275
+[ascending] shots=5000 seed=0 gamma_avg=24.00 init=0
+[completed] 41/275
+[ascending] shots=5000 seed=0 gamma_avg=24.00 init=1
+[completed] 42/275
+[ascending] shots=5000 seed=0 gamma_avg=24.00 init=2
+[completed] 43/275
+[ascending] shots=5000 seed=0 gamma_avg=24.00 init=3
+[completed] 44/275
+[ascending] shots=5000 seed=0 gamma_avg=24.00 init=4
+[completed] 45/275
+[ascending] shots=5000 seed=0 gamma_avg=36.00 init=0
+[completed] 46/275
+[ascending] shots=5000 seed=0 gamma_avg=36.00 init=1
+[completed] 47/275
+[ascending] shots=5000 seed=0 gamma_avg=36.00 init=2
+[completed] 48/275
+[ascending] shots=5000 seed=0 gamma_avg=36.00 init=3
+[completed] 49/275
+[ascending] shots=5000 seed=0 gamma_avg=36.00 init=4
+[completed] 50/275
+[ascending] shots=5000 seed=0 gamma_avg=50.00 init=0
+[completed] 51/275
+[ascending] shots=5000 seed=0 gamma_avg=50.00 init=1
+[completed] 52/275
+[ascending] shots=5000 seed=0 gamma_avg=50.00 init=2
+[completed] 53/275
+[ascending] shots=5000 seed=0 gamma_avg=50.00 init=3
+[completed] 54/275
+[ascending] shots=5000 seed=0 gamma_avg=50.00 init=4
+[completed] 55/275
+[ascending] shots=5000 seed=1 gamma_avg=0.00 init=0
+[completed] 56/275
+[ascending] shots=5000 seed=1 gamma_avg=0.00 init=1
+[completed] 57/275
+[ascending] shots=5000 seed=1 gamma_avg=0.00 init=2
+[completed] 58/275
+[ascending] shots=5000 seed=1 gamma_avg=0.00 init=3
+[completed] 59/275
+[ascending] shots=5000 seed=1 gamma_avg=0.00 init=4
+[completed] 60/275
+[ascending] shots=5000 seed=1 gamma_avg=1.00 init=0
+[completed] 61/275
+[ascending] shots=5000 seed=1 gamma_avg=1.00 init=1
+[completed] 62/275
+[ascending] shots=5000 seed=1 gamma_avg=1.00 init=2
+[completed] 63/275
+[ascending] shots=5000 seed=1 gamma_avg=1.00 init=3
+[completed] 64/275
+[ascending] shots=5000 seed=1 gamma_avg=1.00 init=4
+[completed] 65/275
+[ascending] shots=5000 seed=1 gamma_avg=2.00 init=0
+[completed] 66/275
+[ascending] shots=5000 seed=1 gamma_avg=2.00 init=1
+[completed] 67/275
+[ascending] shots=5000 seed=1 gamma_avg=2.00 init=2
+[completed] 68/275
+[ascending] shots=5000 seed=1 gamma_avg=2.00 init=3
+[completed] 69/275
+[ascending] shots=5000 seed=1 gamma_avg=2.00 init=4
+[completed] 70/275
+[ascending] shots=5000 seed=1 gamma_avg=3.00 init=0
+[completed] 71/275
+[ascending] shots=5000 seed=1 gamma_avg=3.00 init=1
+[completed] 72/275
+[ascending] shots=5000 seed=1 gamma_avg=3.00 init=2
+[completed] 73/275
+[ascending] shots=5000 seed=1 gamma_avg=3.00 init=3
+[completed] 74/275
+[ascending] shots=5000 seed=1 gamma_avg=3.00 init=4
+[completed] 75/275
+[ascending] shots=5000 seed=1 gamma_avg=4.00 init=0
+[completed] 76/275
+[ascending] shots=5000 seed=1 gamma_avg=4.00 init=1
+[completed] 77/275
+[ascending] shots=5000 seed=1 gamma_avg=4.00 init=2
+[completed] 78/275
+[ascending] shots=5000 seed=1 gamma_avg=4.00 init=3
+[completed] 79/275
+[ascending] shots=5000 seed=1 gamma_avg=4.00 init=4
+[completed] 80/275
+[ascending] shots=5000 seed=1 gamma_avg=8.00 init=0
+[completed] 81/275
+[ascending] shots=5000 seed=1 gamma_avg=8.00 init=1
+[completed] 82/275
+[ascending] shots=5000 seed=1 gamma_avg=8.00 init=2
+[completed] 83/275
+[ascending] shots=5000 seed=1 gamma_avg=8.00 init=3
+[completed] 84/275
+[ascending] shots=5000 seed=1 gamma_avg=8.00 init=4
+[completed] 85/275
+[ascending] shots=5000 seed=1 gamma_avg=10.00 init=0
+[completed] 86/275
+[ascending] shots=5000 seed=1 gamma_avg=10.00 init=1
+[completed] 87/275
+[ascending] shots=5000 seed=1 gamma_avg=10.00 init=2
+[completed] 88/275
+[ascending] shots=5000 seed=1 gamma_avg=10.00 init=3
+[completed] 89/275
+[ascending] shots=5000 seed=1 gamma_avg=10.00 init=4
+[completed] 90/275
+[ascending] shots=5000 seed=1 gamma_avg=16.00 init=0
+[completed] 91/275
+[ascending] shots=5000 seed=1 gamma_avg=16.00 init=1
+[completed] 92/275
+[ascending] shots=5000 seed=1 gamma_avg=16.00 init=2
+[completed] 93/275
+[ascending] shots=5000 seed=1 gamma_avg=16.00 init=3
+[completed] 94/275
+[ascending] shots=5000 seed=1 gamma_avg=16.00 init=4
+[completed] 95/275
+[ascending] shots=5000 seed=1 gamma_avg=24.00 init=0
+[completed] 96/275
+[ascending] shots=5000 seed=1 gamma_avg=24.00 init=1
+[completed] 97/275
+[ascending] shots=5000 seed=1 gamma_avg=24.00 init=2
+[completed] 98/275
+[ascending] shots=5000 seed=1 gamma_avg=24.00 init=3
+[completed] 99/275
+[ascending] shots=5000 seed=1 gamma_avg=24.00 init=4
+[completed] 100/275
+[ascending] shots=5000 seed=1 gamma_avg=36.00 init=0
+[completed] 101/275
+[ascending] shots=5000 seed=1 gamma_avg=36.00 init=1
+[completed] 102/275
+[ascending] shots=5000 seed=1 gamma_avg=36.00 init=2
+[completed] 103/275
+[ascending] shots=5000 seed=1 gamma_avg=36.00 init=3
+[completed] 104/275
+[ascending] shots=5000 seed=1 gamma_avg=36.00 init=4
+[completed] 105/275
+[ascending] shots=5000 seed=1 gamma_avg=50.00 init=0
+[completed] 106/275
+[ascending] shots=5000 seed=1 gamma_avg=50.00 init=1
+[completed] 107/275
+[ascending] shots=5000 seed=1 gamma_avg=50.00 init=2
+[completed] 108/275
+[ascending] shots=5000 seed=1 gamma_avg=50.00 init=3
+[completed] 109/275
+[ascending] shots=5000 seed=1 gamma_avg=50.00 init=4
+[completed] 110/275
+[ascending] shots=5000 seed=2 gamma_avg=0.00 init=0
+[completed] 111/275
+[ascending] shots=5000 seed=2 gamma_avg=0.00 init=1
+[completed] 112/275
+[ascending] shots=5000 seed=2 gamma_avg=0.00 init=2
+[completed] 113/275
+[ascending] shots=5000 seed=2 gamma_avg=0.00 init=3
+[completed] 114/275
+[ascending] shots=5000 seed=2 gamma_avg=0.00 init=4
+[completed] 115/275
+[ascending] shots=5000 seed=2 gamma_avg=1.00 init=0
+[completed] 116/275
+[ascending] shots=5000 seed=2 gamma_avg=1.00 init=1
+[completed] 117/275
+[ascending] shots=5000 seed=2 gamma_avg=1.00 init=2
+[completed] 118/275
+[ascending] shots=5000 seed=2 gamma_avg=1.00 init=3
+[completed] 119/275
+[ascending] shots=5000 seed=2 gamma_avg=1.00 init=4
+[completed] 120/275
+[ascending] shots=5000 seed=2 gamma_avg=2.00 init=0
+[completed] 121/275
+[ascending] shots=5000 seed=2 gamma_avg=2.00 init=1
+[completed] 122/275
+[ascending] shots=5000 seed=2 gamma_avg=2.00 init=2
+[completed] 123/275
+[ascending] shots=5000 seed=2 gamma_avg=2.00 init=3
+[completed] 124/275
+[ascending] shots=5000 seed=2 gamma_avg=2.00 init=4
+[completed] 125/275
+[ascending] shots=5000 seed=2 gamma_avg=3.00 init=0
+[completed] 126/275
+[ascending] shots=5000 seed=2 gamma_avg=3.00 init=1
+[completed] 127/275
+[ascending] shots=5000 seed=2 gamma_avg=3.00 init=2
+[completed] 128/275
+[ascending] shots=5000 seed=2 gamma_avg=3.00 init=3
+[completed] 129/275
+[ascending] shots=5000 seed=2 gamma_avg=3.00 init=4
+[completed] 130/275
+[ascending] shots=5000 seed=2 gamma_avg=4.00 init=0
+[completed] 131/275
+[ascending] shots=5000 seed=2 gamma_avg=4.00 init=1
+[completed] 132/275
+[ascending] shots=5000 seed=2 gamma_avg=4.00 init=2
+[completed] 133/275
+[ascending] shots=5000 seed=2 gamma_avg=4.00 init=3
+[completed] 134/275
+[ascending] shots=5000 seed=2 gamma_avg=4.00 init=4
+[completed] 135/275
+[ascending] shots=5000 seed=2 gamma_avg=8.00 init=0
+[completed] 136/275
+[ascending] shots=5000 seed=2 gamma_avg=8.00 init=1
+[completed] 137/275
+[ascending] shots=5000 seed=2 gamma_avg=8.00 init=2
+[completed] 138/275
+[ascending] shots=5000 seed=2 gamma_avg=8.00 init=3
+[completed] 139/275
+[ascending] shots=5000 seed=2 gamma_avg=8.00 init=4
+[completed] 140/275
+[ascending] shots=5000 seed=2 gamma_avg=10.00 init=0
+[completed] 141/275
+[ascending] shots=5000 seed=2 gamma_avg=10.00 init=1
+[completed] 142/275
+[ascending] shots=5000 seed=2 gamma_avg=10.00 init=2
+[completed] 143/275
+[ascending] shots=5000 seed=2 gamma_avg=10.00 init=3
+[completed] 144/275
+[ascending] shots=5000 seed=2 gamma_avg=10.00 init=4
+[completed] 145/275
+[ascending] shots=5000 seed=2 gamma_avg=16.00 init=0
+[completed] 146/275
+[ascending] shots=5000 seed=2 gamma_avg=16.00 init=1
+[completed] 147/275
+[ascending] shots=5000 seed=2 gamma_avg=16.00 init=2
+[completed] 148/275
+[ascending] shots=5000 seed=2 gamma_avg=16.00 init=3
+[completed] 149/275
+[ascending] shots=5000 seed=2 gamma_avg=16.00 init=4
+[completed] 150/275
+[ascending] shots=5000 seed=2 gamma_avg=24.00 init=0
+[completed] 151/275
+[ascending] shots=5000 seed=2 gamma_avg=24.00 init=1
+[completed] 152/275
+[ascending] shots=5000 seed=2 gamma_avg=24.00 init=2
+[completed] 153/275
+[ascending] shots=5000 seed=2 gamma_avg=24.00 init=3
+[completed] 154/275
+[ascending] shots=5000 seed=2 gamma_avg=24.00 init=4
+[completed] 155/275
+[ascending] shots=5000 seed=2 gamma_avg=36.00 init=0
+[completed] 156/275
+[ascending] shots=5000 seed=2 gamma_avg=36.00 init=1
+[completed] 157/275
+[ascending] shots=5000 seed=2 gamma_avg=36.00 init=2
+[completed] 158/275
+[ascending] shots=5000 seed=2 gamma_avg=36.00 init=3
+[completed] 159/275
+[ascending] shots=5000 seed=2 gamma_avg=36.00 init=4
+[completed] 160/275
+[ascending] shots=5000 seed=2 gamma_avg=50.00 init=0
+[completed] 161/275
+[ascending] shots=5000 seed=2 gamma_avg=50.00 init=1
+[completed] 162/275
+[ascending] shots=5000 seed=2 gamma_avg=50.00 init=2
+[completed] 163/275
+[ascending] shots=5000 seed=2 gamma_avg=50.00 init=3
+[completed] 164/275
+[ascending] shots=5000 seed=2 gamma_avg=50.00 init=4
+[completed] 165/275
+[ascending] shots=5000 seed=3 gamma_avg=0.00 init=0
+[completed] 166/275
+[ascending] shots=5000 seed=3 gamma_avg=0.00 init=1
+[completed] 167/275
+[ascending] shots=5000 seed=3 gamma_avg=0.00 init=2
+[completed] 168/275
+[ascending] shots=5000 seed=3 gamma_avg=0.00 init=3
+[completed] 169/275
+[ascending] shots=5000 seed=3 gamma_avg=0.00 init=4
+[completed] 170/275
+[ascending] shots=5000 seed=3 gamma_avg=1.00 init=0
+[completed] 171/275
+[ascending] shots=5000 seed=3 gamma_avg=1.00 init=1
+[completed] 172/275
+[ascending] shots=5000 seed=3 gamma_avg=1.00 init=2
+[completed] 173/275
+[ascending] shots=5000 seed=3 gamma_avg=1.00 init=3
+[completed] 174/275
+[ascending] shots=5000 seed=3 gamma_avg=1.00 init=4
+[completed] 175/275
+[ascending] shots=5000 seed=3 gamma_avg=2.00 init=0
+[completed] 176/275
+[ascending] shots=5000 seed=3 gamma_avg=2.00 init=1
+[completed] 177/275
+[ascending] shots=5000 seed=3 gamma_avg=2.00 init=2
+[completed] 178/275
+[ascending] shots=5000 seed=3 gamma_avg=2.00 init=3
+[completed] 179/275
+[ascending] shots=5000 seed=3 gamma_avg=2.00 init=4
+[completed] 180/275
+[ascending] shots=5000 seed=3 gamma_avg=3.00 init=0
+[completed] 181/275
+[ascending] shots=5000 seed=3 gamma_avg=3.00 init=1
+[completed] 182/275
+[ascending] shots=5000 seed=3 gamma_avg=3.00 init=2
+[completed] 183/275
+[ascending] shots=5000 seed=3 gamma_avg=3.00 init=3
+[completed] 184/275
+[ascending] shots=5000 seed=3 gamma_avg=3.00 init=4
+[completed] 185/275
+[ascending] shots=5000 seed=3 gamma_avg=4.00 init=0
+[completed] 186/275
+[ascending] shots=5000 seed=3 gamma_avg=4.00 init=1
+[completed] 187/275
+[ascending] shots=5000 seed=3 gamma_avg=4.00 init=2
+[completed] 188/275
+[ascending] shots=5000 seed=3 gamma_avg=4.00 init=3
+[completed] 189/275
+[ascending] shots=5000 seed=3 gamma_avg=4.00 init=4
+[completed] 190/275
+[ascending] shots=5000 seed=3 gamma_avg=8.00 init=0
+[completed] 191/275
+[ascending] shots=5000 seed=3 gamma_avg=8.00 init=1
+[completed] 192/275
+[ascending] shots=5000 seed=3 gamma_avg=8.00 init=2
+[completed] 193/275
+[ascending] shots=5000 seed=3 gamma_avg=8.00 init=3
+[completed] 194/275
+[ascending] shots=5000 seed=3 gamma_avg=8.00 init=4
+[completed] 195/275
+[ascending] shots=5000 seed=3 gamma_avg=10.00 init=0
+[completed] 196/275
+[ascending] shots=5000 seed=3 gamma_avg=10.00 init=1
+[completed] 197/275
+[ascending] shots=5000 seed=3 gamma_avg=10.00 init=2
+[completed] 198/275
+[ascending] shots=5000 seed=3 gamma_avg=10.00 init=3
+[completed] 199/275
+[ascending] shots=5000 seed=3 gamma_avg=10.00 init=4
+[completed] 200/275
+[ascending] shots=5000 seed=3 gamma_avg=16.00 init=0
+[completed] 201/275
+[ascending] shots=5000 seed=3 gamma_avg=16.00 init=1
+[completed] 202/275
+[ascending] shots=5000 seed=3 gamma_avg=16.00 init=2
+[completed] 203/275
+[ascending] shots=5000 seed=3 gamma_avg=16.00 init=3
+[completed] 204/275
+[ascending] shots=5000 seed=3 gamma_avg=16.00 init=4
+[completed] 205/275
+[ascending] shots=5000 seed=3 gamma_avg=24.00 init=0
+[completed] 206/275
+[ascending] shots=5000 seed=3 gamma_avg=24.00 init=1
+[completed] 207/275
+[ascending] shots=5000 seed=3 gamma_avg=24.00 init=2
+[completed] 208/275
+[ascending] shots=5000 seed=3 gamma_avg=24.00 init=3
+[completed] 209/275
+[ascending] shots=5000 seed=3 gamma_avg=24.00 init=4
+[completed] 210/275
+[ascending] shots=5000 seed=3 gamma_avg=36.00 init=0
+[completed] 211/275
+[ascending] shots=5000 seed=3 gamma_avg=36.00 init=1
+[completed] 212/275
+[ascending] shots=5000 seed=3 gamma_avg=36.00 init=2
+[completed] 213/275
+[ascending] shots=5000 seed=3 gamma_avg=36.00 init=3
+[completed] 214/275
+[ascending] shots=5000 seed=3 gamma_avg=36.00 init=4
+[completed] 215/275
+[ascending] shots=5000 seed=3 gamma_avg=50.00 init=0
+[completed] 216/275
+[ascending] shots=5000 seed=3 gamma_avg=50.00 init=1
+[completed] 217/275
+[ascending] shots=5000 seed=3 gamma_avg=50.00 init=2
+[completed] 218/275
+[ascending] shots=5000 seed=3 gamma_avg=50.00 init=3
+[completed] 219/275
+[ascending] shots=5000 seed=3 gamma_avg=50.00 init=4
+[completed] 220/275
+[ascending] shots=5000 seed=4 gamma_avg=0.00 init=0
+[completed] 221/275
+[ascending] shots=5000 seed=4 gamma_avg=0.00 init=1
+[completed] 222/275
+[ascending] shots=5000 seed=4 gamma_avg=0.00 init=2
+[completed] 223/275
+[ascending] shots=5000 seed=4 gamma_avg=0.00 init=3
+[completed] 224/275
+[ascending] shots=5000 seed=4 gamma_avg=0.00 init=4
+[completed] 225/275
+[ascending] shots=5000 seed=4 gamma_avg=1.00 init=0
+[completed] 226/275
+[ascending] shots=5000 seed=4 gamma_avg=1.00 init=1
+[completed] 227/275
+[ascending] shots=5000 seed=4 gamma_avg=1.00 init=2
+[completed] 228/275
+[ascending] shots=5000 seed=4 gamma_avg=1.00 init=3
+[completed] 229/275
+[ascending] shots=5000 seed=4 gamma_avg=1.00 init=4
+[completed] 230/275
+[ascending] shots=5000 seed=4 gamma_avg=2.00 init=0
+[completed] 231/275
+[ascending] shots=5000 seed=4 gamma_avg=2.00 init=1
+[completed] 232/275
+[ascending] shots=5000 seed=4 gamma_avg=2.00 init=2
+[completed] 233/275
+[ascending] shots=5000 seed=4 gamma_avg=2.00 init=3
+[completed] 234/275
+[ascending] shots=5000 seed=4 gamma_avg=2.00 init=4
+[completed] 235/275
+[ascending] shots=5000 seed=4 gamma_avg=3.00 init=0
+[completed] 236/275
+[ascending] shots=5000 seed=4 gamma_avg=3.00 init=1
+[completed] 237/275
+[ascending] shots=5000 seed=4 gamma_avg=3.00 init=2
+[completed] 238/275
+[ascending] shots=5000 seed=4 gamma_avg=3.00 init=3
+[completed] 239/275
+[ascending] shots=5000 seed=4 gamma_avg=3.00 init=4
+[completed] 240/275
+[ascending] shots=5000 seed=4 gamma_avg=4.00 init=0
+[completed] 241/275
+[ascending] shots=5000 seed=4 gamma_avg=4.00 init=1
+[completed] 242/275
+[ascending] shots=5000 seed=4 gamma_avg=4.00 init=2
+[completed] 243/275
+[ascending] shots=5000 seed=4 gamma_avg=4.00 init=3
+[completed] 244/275
+[ascending] shots=5000 seed=4 gamma_avg=4.00 init=4
+[completed] 245/275
+[ascending] shots=5000 seed=4 gamma_avg=8.00 init=0
+[completed] 246/275
+[ascending] shots=5000 seed=4 gamma_avg=8.00 init=1
+[completed] 247/275
+[ascending] shots=5000 seed=4 gamma_avg=8.00 init=2
+[completed] 248/275
+[ascending] shots=5000 seed=4 gamma_avg=8.00 init=3
+[completed] 249/275
+[ascending] shots=5000 seed=4 gamma_avg=8.00 init=4
+[completed] 250/275
+[ascending] shots=5000 seed=4 gamma_avg=10.00 init=0
+[completed] 251/275
+[ascending] shots=5000 seed=4 gamma_avg=10.00 init=1
+[completed] 252/275
+[ascending] shots=5000 seed=4 gamma_avg=10.00 init=2
+[completed] 253/275
+[ascending] shots=5000 seed=4 gamma_avg=10.00 init=3
+[completed] 254/275
+[ascending] shots=5000 seed=4 gamma_avg=10.00 init=4
+[completed] 255/275
+[ascending] shots=5000 seed=4 gamma_avg=16.00 init=0
+[completed] 256/275
+[ascending] shots=5000 seed=4 gamma_avg=16.00 init=1
+[completed] 257/275
+[ascending] shots=5000 seed=4 gamma_avg=16.00 init=2
+[completed] 258/275
+[ascending] shots=5000 seed=4 gamma_avg=16.00 init=3
+[completed] 259/275
+[ascending] shots=5000 seed=4 gamma_avg=16.00 init=4
+[completed] 260/275
+[ascending] shots=5000 seed=4 gamma_avg=24.00 init=0
+[completed] 261/275
+[ascending] shots=5000 seed=4 gamma_avg=24.00 init=1
+[completed] 262/275
+[ascending] shots=5000 seed=4 gamma_avg=24.00 init=2
+[completed] 263/275
+[ascending] shots=5000 seed=4 gamma_avg=24.00 init=3
+[completed] 264/275
+[ascending] shots=5000 seed=4 gamma_avg=24.00 init=4
+[completed] 265/275
+[ascending] shots=5000 seed=4 gamma_avg=36.00 init=0
+[completed] 266/275
+[ascending] shots=5000 seed=4 gamma_avg=36.00 init=1
+[completed] 267/275
+[ascending] shots=5000 seed=4 gamma_avg=36.00 init=2
+[completed] 268/275
+[ascending] shots=5000 seed=4 gamma_avg=36.00 init=3
+[completed] 269/275
+[ascending] shots=5000 seed=4 gamma_avg=36.00 init=4
+[completed] 270/275
+[ascending] shots=5000 seed=4 gamma_avg=50.00 init=0
+[completed] 271/275
+[ascending] shots=5000 seed=4 gamma_avg=50.00 init=1
+[completed] 272/275
+[ascending] shots=5000 seed=4 gamma_avg=50.00 init=2
+[completed] 273/275
+[ascending] shots=5000 seed=4 gamma_avg=50.00 init=3
+[completed] 274/275
+[ascending] shots=5000 seed=4 gamma_avg=50.00 init=4
+[completed] 275/275
+Saved schedule_gamma_all_restarts(shots5000).csv, schedule_gamma_restart_avg(shots5000).csv, schedule_gamma_restart_group(shots5000)all.csv in 4900.23s
