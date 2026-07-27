@@ -1,101 +1,201 @@
-[completed] 1/100 [fixed] shots=5000 seed=0 gamma=0.00 init=0
-[completed] 2/100 [fixed] shots=5000 seed=0 gamma=0.00 init=1
-[completed] 3/100 [fixed] shots=5000 seed=0 gamma=0.00 init=2
-[completed] 4/100 [fixed] shots=5000 seed=0 gamma=0.00 init=3
-[completed] 5/100 [fixed] shots=5000 seed=0 gamma=0.00 init=4
-[completed] 6/100 [fixed] shots=5000 seed=0 gamma=1.00 init=0
-[completed] 7/100 [fixed] shots=5000 seed=0 gamma=1.00 init=1
-[completed] 8/100 [fixed] shots=5000 seed=0 gamma=1.00 init=2
-[completed] 9/100 [fixed] shots=5000 seed=0 gamma=1.00 init=3
-[completed] 10/100 [fixed] shots=5000 seed=0 gamma=1.00 init=4
-[completed] 11/100 [fixed] shots=5000 seed=0 gamma=2.00 init=0
-[completed] 12/100 [fixed] shots=5000 seed=0 gamma=2.00 init=1
-[completed] 13/100 [fixed] shots=5000 seed=0 gamma=2.00 init=2
-[completed] 14/100 [fixed] shots=5000 seed=0 gamma=2.00 init=3
-[completed] 15/100 [fixed] shots=5000 seed=0 gamma=2.00 init=4
-[completed] 16/100 [fixed] shots=5000 seed=0 gamma=4.00 init=0
-[completed] 17/100 [fixed] shots=5000 seed=0 gamma=4.00 init=1
-[completed] 18/100 [fixed] shots=5000 seed=0 gamma=4.00 init=2
-[completed] 19/100 [fixed] shots=5000 seed=0 gamma=4.00 init=3
-[completed] 20/100 [fixed] shots=5000 seed=0 gamma=4.00 init=4
-[completed] 21/100 [fixed] shots=5000 seed=1 gamma=0.00 init=0
-[completed] 22/100 [fixed] shots=5000 seed=1 gamma=0.00 init=1
-[completed] 23/100 [fixed] shots=5000 seed=1 gamma=0.00 init=2
-[completed] 24/100 [fixed] shots=5000 seed=1 gamma=0.00 init=3
-[completed] 25/100 [fixed] shots=5000 seed=1 gamma=0.00 init=4
-[completed] 26/100 [fixed] shots=5000 seed=1 gamma=1.00 init=0
-[completed] 27/100 [fixed] shots=5000 seed=1 gamma=1.00 init=1
-[completed] 28/100 [fixed] shots=5000 seed=1 gamma=1.00 init=2
-[completed] 29/100 [fixed] shots=5000 seed=1 gamma=1.00 init=3
-[completed] 30/100 [fixed] shots=5000 seed=1 gamma=1.00 init=4
-[completed] 31/100 [fixed] shots=5000 seed=1 gamma=2.00 init=0
-[completed] 32/100 [fixed] shots=5000 seed=1 gamma=2.00 init=1
-[completed] 33/100 [fixed] shots=5000 seed=1 gamma=2.00 init=2
-[completed] 34/100 [fixed] shots=5000 seed=1 gamma=2.00 init=3
-[completed] 35/100 [fixed] shots=5000 seed=1 gamma=2.00 init=4
-[completed] 36/100 [fixed] shots=5000 seed=1 gamma=4.00 init=0
-[completed] 37/100 [fixed] shots=5000 seed=1 gamma=4.00 init=1
-[completed] 38/100 [fixed] shots=5000 seed=1 gamma=4.00 init=2
-[completed] 39/100 [fixed] shots=5000 seed=1 gamma=4.00 init=3
-[completed] 40/100 [fixed] shots=5000 seed=1 gamma=4.00 init=4
-[completed] 41/100 [fixed] shots=5000 seed=2 gamma=0.00 init=0
-[completed] 42/100 [fixed] shots=5000 seed=2 gamma=0.00 init=1
-[completed] 43/100 [fixed] shots=5000 seed=2 gamma=0.00 init=2
-[completed] 44/100 [fixed] shots=5000 seed=2 gamma=0.00 init=3
-[completed] 45/100 [fixed] shots=5000 seed=2 gamma=0.00 init=4
-[completed] 46/100 [fixed] shots=5000 seed=2 gamma=1.00 init=0
-[completed] 47/100 [fixed] shots=5000 seed=2 gamma=1.00 init=1
-[completed] 48/100 [fixed] shots=5000 seed=2 gamma=1.00 init=2
-[completed] 49/100 [fixed] shots=5000 seed=2 gamma=1.00 init=3
-[completed] 50/100 [fixed] shots=5000 seed=2 gamma=1.00 init=4
-[completed] 51/100 [fixed] shots=5000 seed=2 gamma=2.00 init=0
-[completed] 52/100 [fixed] shots=5000 seed=2 gamma=2.00 init=1
-[completed] 53/100 [fixed] shots=5000 seed=2 gamma=2.00 init=2
-[completed] 54/100 [fixed] shots=5000 seed=2 gamma=2.00 init=3
-[completed] 55/100 [fixed] shots=5000 seed=2 gamma=2.00 init=4
-[completed] 56/100 [fixed] shots=5000 seed=2 gamma=4.00 init=0
-[completed] 57/100 [fixed] shots=5000 seed=2 gamma=4.00 init=1
-[completed] 58/100 [fixed] shots=5000 seed=2 gamma=4.00 init=2
-[completed] 59/100 [fixed] shots=5000 seed=2 gamma=4.00 init=4
-[completed] 60/100 [fixed] shots=5000 seed=2 gamma=4.00 init=3
-[completed] 61/100 [fixed] shots=5000 seed=3 gamma=0.00 init=0
-[completed] 62/100 [fixed] shots=5000 seed=3 gamma=0.00 init=1
-[completed] 63/100 [fixed] shots=5000 seed=3 gamma=0.00 init=2
-[completed] 64/100 [fixed] shots=5000 seed=3 gamma=0.00 init=3
-[completed] 65/100 [fixed] shots=5000 seed=3 gamma=0.00 init=4
-[completed] 66/100 [fixed] shots=5000 seed=3 gamma=1.00 init=0
-[completed] 67/100 [fixed] shots=5000 seed=3 gamma=1.00 init=1
-[completed] 68/100 [fixed] shots=5000 seed=3 gamma=1.00 init=2
-[completed] 69/100 [fixed] shots=5000 seed=3 gamma=1.00 init=3
-[completed] 70/100 [fixed] shots=5000 seed=3 gamma=1.00 init=4
-[completed] 71/100 [fixed] shots=5000 seed=3 gamma=2.00 init=0
-[completed] 72/100 [fixed] shots=5000 seed=3 gamma=2.00 init=1
-[completed] 73/100 [fixed] shots=5000 seed=3 gamma=2.00 init=2
-[completed] 74/100 [fixed] shots=5000 seed=3 gamma=2.00 init=3
-[completed] 75/100 [fixed] shots=5000 seed=3 gamma=2.00 init=4
-[completed] 76/100 [fixed] shots=5000 seed=3 gamma=4.00 init=0
-[completed] 77/100 [fixed] shots=5000 seed=3 gamma=4.00 init=1
-[completed] 78/100 [fixed] shots=5000 seed=3 gamma=4.00 init=2
-[completed] 79/100 [fixed] shots=5000 seed=3 gamma=4.00 init=3
-[completed] 80/100 [fixed] shots=5000 seed=3 gamma=4.00 init=4
-[completed] 81/100 [fixed] shots=5000 seed=4 gamma=0.00 init=0
-[completed] 82/100 [fixed] shots=5000 seed=4 gamma=0.00 init=1
-[completed] 83/100 [fixed] shots=5000 seed=4 gamma=0.00 init=2
-[completed] 84/100 [fixed] shots=5000 seed=4 gamma=0.00 init=3
-[completed] 85/100 [fixed] shots=5000 seed=4 gamma=0.00 init=4
-[completed] 86/100 [fixed] shots=5000 seed=4 gamma=1.00 init=0
-[completed] 87/100 [fixed] shots=5000 seed=4 gamma=1.00 init=1
-[completed] 88/100 [fixed] shots=5000 seed=4 gamma=1.00 init=2
-[completed] 89/100 [fixed] shots=5000 seed=4 gamma=1.00 init=3
-[completed] 90/100 [fixed] shots=5000 seed=4 gamma=1.00 init=4
-[completed] 91/100 [fixed] shots=5000 seed=4 gamma=2.00 init=0
-[completed] 92/100 [fixed] shots=5000 seed=4 gamma=2.00 init=1
-[completed] 93/100 [fixed] shots=5000 seed=4 gamma=2.00 init=2
-[completed] 94/100 [fixed] shots=5000 seed=4 gamma=2.00 init=3
-[completed] 95/100 [fixed] shots=5000 seed=4 gamma=2.00 init=4
-[completed] 96/100 [fixed] shots=5000 seed=4 gamma=4.00 init=0
-[completed] 97/100 [fixed] shots=5000 seed=4 gamma=4.00 init=1
-[completed] 98/100 [fixed] shots=5000 seed=4 gamma=4.00 init=2
-[completed] 99/100 [fixed] shots=5000 seed=4 gamma=4.00 init=3
-[completed] 100/100 [fixed] shots=5000 seed=4 gamma=4.00 init=4
-Saved fixed_gamma_all_restarts(shot5000).csv, fixed_gamma_restart_avg(shot5000).csv, fixed_gamma_shot_5000.csv in 1040.63s
+[fixed] shots=5000 seed=0 gamma=0.00 init=0
+[completed] 1/100
+[fixed] shots=5000 seed=0 gamma=0.00 init=1
+[completed] 2/100
+[fixed] shots=5000 seed=0 gamma=0.00 init=2
+[completed] 3/100
+[fixed] shots=5000 seed=0 gamma=0.00 init=3
+[completed] 4/100
+[fixed] shots=5000 seed=0 gamma=0.00 init=4
+[completed] 5/100
+[fixed] shots=5000 seed=0 gamma=1.00 init=0
+[completed] 6/100
+[fixed] shots=5000 seed=0 gamma=1.00 init=1
+[completed] 7/100
+[fixed] shots=5000 seed=0 gamma=1.00 init=2
+[completed] 8/100
+[fixed] shots=5000 seed=0 gamma=1.00 init=3
+[completed] 9/100
+[fixed] shots=5000 seed=0 gamma=1.00 init=4
+[completed] 10/100
+[fixed] shots=5000 seed=0 gamma=2.00 init=0
+[completed] 11/100
+[fixed] shots=5000 seed=0 gamma=2.00 init=1
+[completed] 12/100
+[fixed] shots=5000 seed=0 gamma=2.00 init=2
+[completed] 13/100
+[fixed] shots=5000 seed=0 gamma=2.00 init=3
+[completed] 14/100
+[fixed] shots=5000 seed=0 gamma=2.00 init=4
+[completed] 15/100
+[fixed] shots=5000 seed=0 gamma=4.00 init=0
+[completed] 16/100
+[fixed] shots=5000 seed=0 gamma=4.00 init=1
+[completed] 17/100
+[fixed] shots=5000 seed=0 gamma=4.00 init=2
+[completed] 18/100
+[fixed] shots=5000 seed=0 gamma=4.00 init=3
+[completed] 19/100
+[fixed] shots=5000 seed=0 gamma=4.00 init=4
+[completed] 20/100
+[fixed] shots=5000 seed=1 gamma=0.00 init=0
+[completed] 21/100
+[fixed] shots=5000 seed=1 gamma=0.00 init=1
+[completed] 22/100
+[fixed] shots=5000 seed=1 gamma=0.00 init=2
+[completed] 23/100
+[fixed] shots=5000 seed=1 gamma=0.00 init=3
+[completed] 24/100
+[fixed] shots=5000 seed=1 gamma=0.00 init=4
+[completed] 25/100
+[fixed] shots=5000 seed=1 gamma=1.00 init=0
+[completed] 26/100
+[fixed] shots=5000 seed=1 gamma=1.00 init=1
+[completed] 27/100
+[fixed] shots=5000 seed=1 gamma=1.00 init=2
+[completed] 28/100
+[fixed] shots=5000 seed=1 gamma=1.00 init=3
+[completed] 29/100
+[fixed] shots=5000 seed=1 gamma=1.00 init=4
+[completed] 30/100
+[fixed] shots=5000 seed=1 gamma=2.00 init=0
+[completed] 31/100
+[fixed] shots=5000 seed=1 gamma=2.00 init=1
+[completed] 32/100
+[fixed] shots=5000 seed=1 gamma=2.00 init=2
+[completed] 33/100
+[fixed] shots=5000 seed=1 gamma=2.00 init=3
+[completed] 34/100
+[fixed] shots=5000 seed=1 gamma=2.00 init=4
+[completed] 35/100
+[fixed] shots=5000 seed=1 gamma=4.00 init=0
+[completed] 36/100
+[fixed] shots=5000 seed=1 gamma=4.00 init=1
+[completed] 37/100
+[fixed] shots=5000 seed=1 gamma=4.00 init=2
+[completed] 38/100
+[fixed] shots=5000 seed=1 gamma=4.00 init=3
+[completed] 39/100
+[fixed] shots=5000 seed=1 gamma=4.00 init=4
+[completed] 40/100
+[fixed] shots=5000 seed=2 gamma=0.00 init=0
+[completed] 41/100
+[fixed] shots=5000 seed=2 gamma=0.00 init=1
+[completed] 42/100
+[fixed] shots=5000 seed=2 gamma=0.00 init=2
+[completed] 43/100
+[fixed] shots=5000 seed=2 gamma=0.00 init=3
+[completed] 44/100
+[fixed] shots=5000 seed=2 gamma=0.00 init=4
+[completed] 45/100
+[fixed] shots=5000 seed=2 gamma=1.00 init=0
+[completed] 46/100
+[fixed] shots=5000 seed=2 gamma=1.00 init=1
+[completed] 47/100
+[fixed] shots=5000 seed=2 gamma=1.00 init=2
+[completed] 48/100
+[fixed] shots=5000 seed=2 gamma=1.00 init=3
+[completed] 49/100
+[fixed] shots=5000 seed=2 gamma=1.00 init=4
+[completed] 50/100
+[fixed] shots=5000 seed=2 gamma=2.00 init=0
+[completed] 51/100
+[fixed] shots=5000 seed=2 gamma=2.00 init=1
+[completed] 52/100
+[fixed] shots=5000 seed=2 gamma=2.00 init=2
+[completed] 53/100
+[fixed] shots=5000 seed=2 gamma=2.00 init=3
+[completed] 54/100
+[fixed] shots=5000 seed=2 gamma=2.00 init=4
+[completed] 55/100
+[fixed] shots=5000 seed=2 gamma=4.00 init=0
+[completed] 56/100
+[fixed] shots=5000 seed=2 gamma=4.00 init=1
+[completed] 57/100
+[fixed] shots=5000 seed=2 gamma=4.00 init=2
+[completed] 58/100
+[fixed] shots=5000 seed=2 gamma=4.00 init=3
+[completed] 59/100
+[fixed] shots=5000 seed=2 gamma=4.00 init=4
+[completed] 60/100
+[fixed] shots=5000 seed=3 gamma=0.00 init=0
+[completed] 61/100
+[fixed] shots=5000 seed=3 gamma=0.00 init=1
+[completed] 62/100
+[fixed] shots=5000 seed=3 gamma=0.00 init=2
+[completed] 63/100
+[fixed] shots=5000 seed=3 gamma=0.00 init=3
+[completed] 64/100
+[fixed] shots=5000 seed=3 gamma=0.00 init=4
+[completed] 65/100
+[fixed] shots=5000 seed=3 gamma=1.00 init=0
+[completed] 66/100
+[fixed] shots=5000 seed=3 gamma=1.00 init=1
+[completed] 67/100
+[fixed] shots=5000 seed=3 gamma=1.00 init=2
+[completed] 68/100
+[fixed] shots=5000 seed=3 gamma=1.00 init=3
+[completed] 69/100
+[fixed] shots=5000 seed=3 gamma=1.00 init=4
+[completed] 70/100
+[fixed] shots=5000 seed=3 gamma=2.00 init=0
+[completed] 71/100
+[fixed] shots=5000 seed=3 gamma=2.00 init=1
+[completed] 72/100
+[fixed] shots=5000 seed=3 gamma=2.00 init=2
+[completed] 73/100
+[fixed] shots=5000 seed=3 gamma=2.00 init=3
+[completed] 74/100
+[fixed] shots=5000 seed=3 gamma=2.00 init=4
+[completed] 75/100
+[fixed] shots=5000 seed=3 gamma=4.00 init=0
+[completed] 76/100
+[fixed] shots=5000 seed=3 gamma=4.00 init=1
+[completed] 77/100
+[fixed] shots=5000 seed=3 gamma=4.00 init=2
+[completed] 78/100
+[fixed] shots=5000 seed=3 gamma=4.00 init=3
+[completed] 79/100
+[fixed] shots=5000 seed=3 gamma=4.00 init=4
+[completed] 80/100
+[fixed] shots=5000 seed=4 gamma=0.00 init=0
+[completed] 81/100
+[fixed] shots=5000 seed=4 gamma=0.00 init=1
+[completed] 82/100
+[fixed] shots=5000 seed=4 gamma=0.00 init=2
+[completed] 83/100
+[fixed] shots=5000 seed=4 gamma=0.00 init=3
+[completed] 84/100
+[fixed] shots=5000 seed=4 gamma=0.00 init=4
+[completed] 85/100
+[fixed] shots=5000 seed=4 gamma=1.00 init=0
+[completed] 86/100
+[fixed] shots=5000 seed=4 gamma=1.00 init=1
+[completed] 87/100
+[fixed] shots=5000 seed=4 gamma=1.00 init=2
+[completed] 88/100
+[fixed] shots=5000 seed=4 gamma=1.00 init=3
+[completed] 89/100
+[fixed] shots=5000 seed=4 gamma=1.00 init=4
+[completed] 90/100
+[fixed] shots=5000 seed=4 gamma=2.00 init=0
+[completed] 91/100
+[fixed] shots=5000 seed=4 gamma=2.00 init=1
+[completed] 92/100
+[fixed] shots=5000 seed=4 gamma=2.00 init=2
+[completed] 93/100
+[fixed] shots=5000 seed=4 gamma=2.00 init=3
+[completed] 94/100
+[fixed] shots=5000 seed=4 gamma=2.00 init=4
+[completed] 95/100
+[fixed] shots=5000 seed=4 gamma=4.00 init=0
+[completed] 96/100
+[fixed] shots=5000 seed=4 gamma=4.00 init=1
+[completed] 97/100
+[fixed] shots=5000 seed=4 gamma=4.00 init=2
+[completed] 98/100
+[fixed] shots=5000 seed=4 gamma=4.00 init=3
+[completed] 99/100
+[fixed] shots=5000 seed=4 gamma=4.00 init=4
+[completed] 100/100
+Saved fixed_gamma_all_restarts(shot5000).csv, fixed_gamma_restart_avg(shot5000).csv, fixed_gamma_shot_5000.csv in 2125.16s

@@ -33,8 +33,11 @@ class ObjectiveSpec:
         if self.kind == "qtl_schedule":
             if self.gamma_start is None or self.gamma_end is None:
                 raise ValueError("A scheduled QTL objective requires both endpoints.")
-            if self.schedule != "linear":
-                raise ValueError("Only a linear QTL schedule is supported.")
+            if self.schedule not in {"linear", "linear_average"}:
+                raise ValueError(
+                    "Supported QTL schedules are 'linear' and "
+                    "'linear_average'."
+                )
 
 
 @dataclass(frozen=True)
@@ -43,12 +46,12 @@ class OptimizationSettings:
 
     shots: int = 5000
     steps: int = 100
-    learning_rate: float = 0.22
-    learning_rate_decay_power: float = 0.30
-    learning_rate_decay_offset: float = 4.0
-    momentum: float = 0.75
-    tilt_learning_rate_penalty: float = 0.005
-    gradient_clip: float = 3.0
+    learning_rate: float = 0.18
+    learning_rate_decay_power: float = 0.35
+    learning_rate_decay_offset: float = 6.0
+    momentum: float = 0.70
+    tilt_learning_rate_penalty: float = 0.01
+    gradient_clip: float = 2.5
     tail_window: int = 10
     simulator: str = "default.qubit"
 
@@ -97,12 +100,36 @@ def gamma_at_step(
     if objective.kind != "qtl_schedule":
         return objective.gamma
     if total_steps <= 1:
+        if objective.schedule == "linear_average":
+            return float(
+                0.5 * (objective.gamma_start + objective.gamma_end)
+            )
         return float(objective.gamma_end)
-    fraction = step / (total_steps - 1)
+    if objective.schedule == "linear_average":
+        # Treat gamma_end as the exclusive linear endpoint. For example,
+        # average gamma=4 with four steps uses 0, 2, 4, 6.
+        fraction = step / total_steps
+    else:
+        fraction = step / (total_steps - 1)
     return float(
         objective.gamma_start
         + fraction * (objective.gamma_end - objective.gamma_start)
     )
+
+
+def average_gamma_over_steps(
+    objective: ObjectiveSpec,
+    total_steps: int,
+) -> float | None:
+    """Return the arithmetic mean of the scheduled optimization tilts."""
+    values = [
+        gamma_at_step(objective, step, total_steps)
+        for step in range(total_steps)
+    ]
+    finite_values = [value for value in values if value is not None]
+    if not finite_values:
+        return None
+    return float(np.mean(finite_values))
 
 
 def objective_loss(

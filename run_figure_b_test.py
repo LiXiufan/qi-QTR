@@ -11,7 +11,7 @@ import pandas as pd
 
 from ascending_tilt import plot_ascending_tilt
 from experiments import (
-    DEFAULT_ASCENDING_FINAL_GAMMAS,
+    DEFAULT_ASCENDING_AVERAGE_GAMMAS,
     DEFAULT_FIXED_GAMMAS,
     SHARED_TILT_OPTIMIZER,
 )
@@ -103,7 +103,7 @@ def finalize_test_artifacts(
     )
     ascending = _validate_summary(
         ascending_path,
-        expected_rows=len(DEFAULT_ASCENDING_FINAL_GAMMAS),
+        expected_rows=len(DEFAULT_ASCENDING_AVERAGE_GAMMAS),
     )
     fixed.insert(0, "dataset", "fixed")
     ascending.insert(0, "dataset", "ascending")

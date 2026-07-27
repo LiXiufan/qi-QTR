@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "E:\李修凡的资料\博四（下）\QTL\qi-QTR\run_figure_b_test.py", line 275, in <module>
+    main()
+  File "E:\李修凡的资料\博四（下）\QTL\qi-QTR\run_figure_b_test.py", line 260, in main
+    regenerate_test_figure(
+  File "E:\李修凡的资料\博四（下）\QTL\qi-QTR\run_figure_b_test.py", line 186, in regenerate_test_figure
+    finalize_test_artifacts(
+  File "E:\李修凡的资料\博四（下）\QTL\qi-QTR\run_figure_b_test.py", line 131, in finalize_test_artifacts
+    plot_ascending_tilt(
+  File "E:\李修凡的资料\博四（下）\QTL\qi-QTR\ascending_tilt.py", line 322, in plot_ascending_tilt
+    fixed_result = fit_curve_result(r"Fixed $\gamma$", fixed_csv)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\李修凡的资料\博四（下）\QTL\qi-QTR\ascending_tilt.py", line 142, in fit_curve_result
+    gamma, ratio, sem = load_final_ratio_data(data_path)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\李修凡的资料\博四（下）\QTL\qi-QTR\ascending_tilt.py", line 72, in load_final_ratio_data
+    raise ValueError(
+ValueError: E:\李修凡的资料\博四（下）\QTL\qi-QTR\figure_b_test_run_gamma_2_8_16\fixed_gamma_shot_5000.csv requires at least four points for a cubic fit.

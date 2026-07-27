@@ -57,7 +57,7 @@ With `T=100` and five graph seeds/five initializations:
 | Fixed tilt, 1,000 shots, 12 gamma values | 300 | 300,000 | 300,000,000 |
 | Fixed tilt, 5,000 shots, 12 gamma values | 300 | 300,000 | 1,500,000,000 |
 | Fixed tilt, 10,000 shots, 12 gamma values | 300 | 300,000 | 3,000,000,000 |
-| Ascending tilt, 5,000 shots, 13 final gamma values | 325 | 325,000 | 1,625,000,000 |
+| Ascending tilt, 5,000 shots, 13 average gamma values | 325 | 325,000 | 1,625,000,000 |
 | Scale benchmark, 5,000 shots, `p=1` | 225 | 135,000 | 675,000,000 |
 | Scale benchmark, 5,000 shots, `p=2` | 225 | 225,000 | 1,125,000,000 |
 | Scale benchmark, 5,000 shots, `p=3` | 225 | 315,000 | 1,575,000,000 |
@@ -85,35 +85,25 @@ Both tilt sweeps call the same `tilt_optimization_settings` function and use:
 | Setting | Value |
 |---|---:|
 | Steps | 100 |
-| Base learning rate | 0.22 |
-| Decay power | 0.30 |
-| Decay offset | 4.0 |
-| Polyak momentum | 0.75 |
-| Tilt learning-rate penalty | 0.005 |
-| Gradient clip | 3.0 |
+| Base learning rate | 0.18 |
+| Decay power | 0.35 |
+| Decay offset | 6.0 |
+| Polyak momentum | 0.70 |
+| Tilt learning-rate penalty | 0.01 |
+| Gradient clip | 2.5 |
 | Tail window | 10 |
 
 The effective learning rate is
 
 \[
 \eta_t =
-\frac{0.22}
-{(t+1+4)^{0.30}(1+0.005|\gamma_t|)}.
+\frac{0.18}
+{(t+1+6)^{0.35}(1+0.01|\gamma_t|)}.
 \]
 
-This profile was selected by `tune_ascending_optimizer.py` from seven candidates
-centered on the old ascending settings. Every candidate used the same `n=8`,
-`p=2` problems, initialization, graph seeds `0,1,2`, linear schedules ending at
-`gamma=0.8,2,4`, 1,000 shots, and 25 optimization steps. Ranking used mean final
-approximation ratio, with mean tail ratio and worst final ratio as tie-breakers.
-The selected `balanced` profile scored `0.822176`; the old ascending profile
-scored `0.820329`. This is an auditable screening result over the stated
-candidate set, not a global-optimality claim.
-
-The aggregate ranking is stored in
-`data_and_figures/ascending_optimizer_screening.csv`; all 63 individual
-benchmark cases are in
-`data_and_figures/ascending_optimizer_screening_runs.csv`.
+These are the original ascending-gamma optimizer settings. The fixed-gamma
+sweep now uses the same profile so optimizer differences cannot confound the
+comparison.
 
 ## Experiment specifications
 
@@ -130,15 +120,27 @@ benchmark cases are in
 ### Figure (b): ascending tilt
 
 - `n=8`, `p=2`, 5,000 shots.
-- Linear schedules from zero to:
+- Requested average gamma values:
   `0,0.2,0.4,0.6,0.8,1,1.2,1.4,1.6,2,2.5,3,4`.
 - Shared tilt initialization base seed: `20260429`.
-- Five initial parameters per graph and endpoint, drawn uniformly from
+- Five initial parameters per graph and requested average, drawn uniformly from
   `[0,2pi)`.
 
 Fixed and ascending sweeps obtain these points from the same
 `build_tilt_initial_points` helper. Thus initialization ID `i` uses the same
 seed and exact parameter vector in both datasets, enabling paired comparison.
+
+For requested average gamma `g`, the ascending schedule retains a linear ramp:
+
+\[
+\gamma_t = \frac{2g\,t}{T},\qquad t=0,\ldots,T-1.
+\]
+
+The discrete average is `g(T-1)/T`, which approaches `g`. For the example
+`g=4,T=4`, the applied values are `0,2,4,6`; for the production `T=100` run,
+their average is `3.96`. Ascending summaries explicitly include
+`gamma_average_requested`, `gamma_average_realized`, `gamma_end_exclusive`,
+and `gamma_last`.
 
 ### Figure (c): scale benchmark
 
@@ -172,6 +174,13 @@ mean_final_ratio, sem_final_ratio
 mean_optimal_mass
 ```
 
+Ascending summaries additionally contain:
+
+```text
+gamma_average_requested, gamma_average_realized
+gamma_start, gamma_end_exclusive, gamma_last
+```
+
 The scale plotting input has one graph-level row per
 `n, p, seed, objective`. `scale_benchmark.py` performs the final mean and SEM
 aggregation.
@@ -189,6 +198,8 @@ The figure files contain no optimization code.
   `a0 + a1*x + a2*x^2 + a3*x^3`.
 - Figure (b) uses `mean_final_ratio` and `sem_final_ratio` for both series, in
   agreement with its y-axis label.
+- Figure (b)'s x-axis reports the requested average gamma for ascending
+  schedules, not the last applied gamma.
 - Figure (a) uses the original solid/dashed/dash-dot line styles, markers,
   colors, framed legend, and fixed axis range.
 - Figure (b) uses the original dashed-blue/solid-orange styles and an RMS SEM

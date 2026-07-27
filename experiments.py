@@ -15,7 +15,9 @@ from qtl import (
     OptimizationSettings,
     RunResult,
     RunSpec,
+    average_gamma_over_steps,
     execute_run,
+    gamma_at_step,
 )
 
 
@@ -35,7 +37,7 @@ DEFAULT_GRAPH_SEEDS = [0, 1, 2, 3, 4]
 #     3.0,
 #     4.0,
 # ]
-# DEFAULT_ASCENDING_FINAL_GAMMAS = [
+# DEFAULT_ASCENDING_AVERAGE_GAMMAS = [
 #     0.0,
 #     0.2,
 #     0.4,
@@ -52,16 +54,47 @@ DEFAULT_GRAPH_SEEDS = [0, 1, 2, 3, 4]
 # ]
 DEFAULT_FIXED_GAMMAS = [
     0.0,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
     1.0,
+    1.2,
+    1.4,
+    1.6,
     2.0,
+    3.0,
     4.0,
+    8.0,
+    10.0,
+    16.0,
+    24.0,
+    36.0,
+    50.0,
 ]
-DEFAULT_ASCENDING_FINAL_GAMMAS = [
+DEFAULT_ASCENDING_AVERAGE_GAMMAS = [
     0.0,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
     1.0,
+    1.2,
+    1.4,
+    1.6,
     2.0,
+    3.0,
     4.0,
+    8.0,
+    10.0,
+    16.0,
+    24.0,
+    36.0,
+    50.0,
 ]
+# Backward-compatible alias. Values now denote schedule averages, not final
+# endpoints; use DEFAULT_ASCENDING_AVERAGE_GAMMAS in new code.
+DEFAULT_ASCENDING_FINAL_GAMMAS = DEFAULT_ASCENDING_AVERAGE_GAMMAS
 DEFAULT_FIXED_SHOTS = [1000, 5000, 10000]
 DEFAULT_NUMBER_OF_INITIALIZATIONS = 5
 
@@ -71,15 +104,14 @@ TILT_INITIALIZATION_BASE_SEED = 20260429
 FIXED_INITIALIZATION_BASE_SEED = TILT_INITIALIZATION_BASE_SEED
 SCHEDULE_INITIALIZATION_BASE_SEED = TILT_INITIALIZATION_BASE_SEED
 
-# Best profile in the reproducible ascending-gamma screen.  Fixed and
-# ascending sweeps intentionally use this exact same optimizer.
+# Original ascending-gamma optimizer, now shared exactly by both tilt sweeps.
 SHARED_TILT_OPTIMIZER = {
-    "learning_rate": 0.22,
-    "learning_rate_decay_power": 0.30,
-    "learning_rate_decay_offset": 4.0,
-    "momentum": 0.75,
-    "tilt_learning_rate_penalty": 0.005,
-    "gradient_clip": 3.0,
+    "learning_rate": 0.18,
+    "learning_rate_decay_power": 0.35,
+    "learning_rate_decay_offset": 6.0,
+    "momentum": 0.70,
+    "tilt_learning_rate_penalty": 0.01,
+    "gradient_clip": 2.5,
 }
 
 
@@ -383,16 +415,16 @@ def run_ascending_tilt_experiment(
     *,
     shots: int = 5000,
     steps: int = 100,
-    final_gamma_values: list[float] | None = None,
+    average_gamma_values: list[float] | None = None,
     output_dir: Path = Path("."),
     number_of_initializations: int = DEFAULT_NUMBER_OF_INITIALIZATIONS,
     tail_window: int = 10,
     workers: int = 1,
     simulator: str = "default.qubit",
 ) -> tuple[Path, Path, Path]:
-    """Run and save the ascending-tilt sweep used for Figure (b)."""
-    final_gamma_values = (
-        final_gamma_values or DEFAULT_ASCENDING_FINAL_GAMMAS
+    """Run ascending schedules indexed by their requested average tilt."""
+    average_gamma_values = (
+        average_gamma_values or DEFAULT_ASCENDING_AVERAGE_GAMMAS
     )
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -408,13 +440,21 @@ def run_ascending_tilt_experiment(
 
     for graph_family in DEFAULT_GRAPH_FAMILIES:
         for graph_seed in DEFAULT_GRAPH_SEEDS:
-            for final_gamma in final_gamma_values:
+            for average_gamma in average_gamma_values:
+                nominal_gamma_end = 2.0 * float(average_gamma)
                 objective = ObjectiveSpec(
-                    f"QTL linear schedule to {final_gamma:.2f}",
+                    (
+                        "QTL ascending schedule with "
+                        f"average gamma={average_gamma:.2f}"
+                    ),
                     "qtl_schedule",
                     gamma_start=0.0,
-                    gamma_end=float(final_gamma),
-                    schedule="linear",
+                    gamma_end=nominal_gamma_end,
+                    schedule="linear_average",
+                )
+                realized_average_gamma = average_gamma_over_steps(
+                    objective,
+                    steps,
                 )
                 for initialization_id, (
                     initialization_seed,
@@ -433,14 +473,27 @@ def run_ascending_tilt_experiment(
                             "initial_parameters": parameters,
                             "settings": settings,
                             "experiment_fields": {
-                                "gamma_plot": float(final_gamma),
+                                "gamma_plot": float(average_gamma),
+                                "gamma_average_requested": float(
+                                    average_gamma
+                                ),
+                                "gamma_average_realized": float(
+                                    realized_average_gamma
+                                ),
                                 "gamma_start": 0.0,
-                                "gamma_end": float(final_gamma),
+                                "gamma_end_exclusive": nominal_gamma_end,
+                                "gamma_last": float(
+                                    gamma_at_step(
+                                        objective,
+                                        steps - 1,
+                                        steps,
+                                    )
+                                ),
                             },
                             "progress_message": (
                                 "[ascending] "
                                 f"shots={shots} seed={graph_seed} "
-                                f"gamma_end={final_gamma:.2f} "
+                                f"gamma_avg={average_gamma:.2f} "
                                 f"init={initialization_id}"
                             ),
                         }
@@ -456,9 +509,32 @@ def run_ascending_tilt_experiment(
             "p",
             "seed",
             "gamma_plot",
+            "gamma_average_requested",
+            "gamma_average_realized",
             "gamma_start",
-            "gamma_end",
+            "gamma_end_exclusive",
+            "gamma_last",
         ],
+    )
+    schedule_metadata = (
+        graph_average[
+            [
+                "gamma_plot",
+                "gamma_average_requested",
+                "gamma_average_realized",
+                "gamma_start",
+                "gamma_end_exclusive",
+                "gamma_last",
+            ]
+        ]
+        .drop_duplicates("gamma_plot")
+        .sort_values("gamma_plot")
+    )
+    grouped_summary = grouped_summary.merge(
+        schedule_metadata,
+        on="gamma_plot",
+        how="left",
+        validate="one_to_one",
     )
     paths = (
         output_dir / f"schedule_gamma_all_restarts(shots{shots}).csv",

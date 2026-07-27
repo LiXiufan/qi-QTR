@@ -6,7 +6,7 @@ import argparse
 from pathlib import Path
 
 from experiments import (
-    DEFAULT_ASCENDING_FINAL_GAMMAS,
+    DEFAULT_ASCENDING_AVERAGE_GAMMAS,
     DEFAULT_FIXED_GAMMAS,
     DEFAULT_FIXED_SHOTS,
     DEFAULT_NUMBER_OF_INITIALIZATIONS,
@@ -79,9 +79,15 @@ def build_parser() -> argparse.ArgumentParser:
         default="default.qubit",
     )
     ascending_parser.add_argument(
+        "--average-gammas",
         "--gamma-ends",
+        dest="average_gammas",
         type=parse_float_list,
-        default=DEFAULT_ASCENDING_FINAL_GAMMAS,
+        default=DEFAULT_ASCENDING_AVERAGE_GAMMAS,
+        help=(
+            "Comma-separated average tilts. --gamma-ends is retained as "
+            "a compatibility alias but has the same average-gamma meaning."
+        ),
     )
     ascending_parser.add_argument(
         "--output-dir",
@@ -150,7 +156,7 @@ def main() -> None:
         run_ascending_tilt_experiment(
             shots=arguments.shots,
             steps=arguments.steps,
-            final_gamma_values=arguments.gamma_ends,
+            average_gamma_values=arguments.average_gammas,
             output_dir=output_dir,
             number_of_initializations=arguments.num_init_points,
             tail_window=arguments.tail_window,
@@ -180,7 +186,7 @@ def main() -> None:
         run_ascending_tilt_experiment(
             shots=5000,
             steps=arguments.steps,
-            final_gamma_values=DEFAULT_ASCENDING_FINAL_GAMMAS,
+            average_gamma_values=DEFAULT_ASCENDING_AVERAGE_GAMMAS,
             output_dir=output_dir,
             number_of_initializations=arguments.num_init_points,
             tail_window=arguments.tail_window,

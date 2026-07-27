@@ -3,16 +3,20 @@
 The experiment mirrors the design of Figure (b): QAOA depth two, five
 independently generated eight-vertex MaxCut instances, repeated initial
 parameters, and graph-level aggregation.  The lower-tail CVaR of the MaxCut
-loss is minimized.  Fixed runs hold ``alpha`` constant, while ascending runs
-linearly increase it from ``alpha_start`` to the alpha shown on the x axis.
+loss is minimized. Fixed runs hold ``alpha`` constant, while scheduled runs
+linearly decrease alpha from one (expectation loss) to the final alpha. Thus,
+the scheduled risk strength ``1 - alpha`` increases during optimization.
 
 The script creates:
 
 * ``CVaR.csv`` -- restart and aggregate simulation results plus curve fits;
 * ``CVAR.jpg`` and ``CVAR.pdf`` -- Figure (d);
+* ``CVAR_fixed_alpha.jpg`` and ``CVAR_fixed_alpha.pdf`` -- fixed-alpha-only
+  curve with a shaded graph-level SEM range;
 * ``performance_matching_function.jpg`` and
-  ``performance_matching_function.pdf`` -- fitted ascending-CVaR and
-  ascending-QTL performance on a common risk-strength coordinate.
+  ``performance_matching_function.pdf`` -- fixed-CVaR and fixed-QTL
+  response functions on a logarithmically matched landscape-control
+  coordinate.
 """
 
 from __future__ import annotations
@@ -28,13 +32,8 @@ import numpy as np
 import pandas as pd
 import pennylane as qml
 from pennylane import numpy as qnp
+from scipy.optimize import least_squares
 
-from ascending_tilt import (
-    FIT_GAMMA_MAX,
-    cubic_model,
-    fit_curve_result,
-    fit_weighted_cubic,
-)
 from experiments import (
     DEFAULT_GRAPH_FAMILIES,
     DEFAULT_GRAPH_SEEDS,
@@ -50,16 +49,19 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_CSV = SCRIPT_DIR / "CVaR.csv"
 DEFAULT_CVAR_JPG = SCRIPT_DIR / "CVAR.jpg"
 DEFAULT_CVAR_PDF = SCRIPT_DIR / "CVAR.pdf"
+DEFAULT_FIXED_JPG = SCRIPT_DIR / "CVAR_fixed_alpha.jpg"
+DEFAULT_FIXED_PDF = SCRIPT_DIR / "CVAR_fixed_alpha.pdf"
 DEFAULT_PERFORMANCE_JPG = SCRIPT_DIR / "performance_matching_function.jpg"
 DEFAULT_PERFORMANCE_PDF = SCRIPT_DIR / "performance_matching_function.pdf"
-DEFAULT_QTL_ASCENDING_CSV = (
+DEFAULT_QTL_FIXED_CSV = (
     SCRIPT_DIR
     / "data_and_figures"
-    / "schedule_gamma_restart_group(shots5000)all.csv"
+    / "fixed_gamma_shot_5000.csv"
 )
 DEFAULT_ALPHAS = (0.10, 0.20, 0.35, 0.50, 0.65, 0.80, 1.00)
 INITIALIZATION_BASE_SEED = 20260726
 DENSE_POINTS = 800
+FIT_GAMMA_MAX = 4.0
 TWO_PI = 2.0 * np.pi
 
 
@@ -72,7 +74,7 @@ class CVaRSettings:
     n: int = 8
     depth: int = 2
     number_of_initializations: int = 5
-    alpha_start: float = 0.10
+    alpha_start: float = 1.00
     tail_window: int = 10
     learning_rate: float = SHARED_TILT_OPTIMIZER["learning_rate"]
     learning_rate_decay_power: float = SHARED_TILT_OPTIMIZER[
@@ -100,6 +102,201 @@ class CVaRSettings:
             raise ValueError("tail_window must be positive.")
 
 
+@dataclass(frozen=True)
+class MatchingCurveResult:
+    """Data and parameters for a robust cubic matching function."""
+
+    parameter_data: np.ndarray
+    ratio_data: np.ndarray
+    sem_data: np.ndarray
+    params: dict[str, float | str]
+
+
+def cubic_model(x, a0, a1, a2, a3):
+    """Evaluate a cubic polynomial in increasing coefficient order."""
+    x = np.asarray(x, dtype=float)
+    return a0 + a1 * x + a2 * x**2 + a3 * x**3
+
+
+def asymmetric_peak_model(
+    parameter: np.ndarray,
+    peak_value: float,
+    peak_parameter: float,
+    left_curvature: float,
+    right_curvature: float,
+) -> np.ndarray:
+    """Evaluate a continuous asymmetric quadratic around an empirical peak."""
+    parameter = np.asarray(parameter, dtype=float)
+    displacement = parameter - peak_parameter
+    curvature = np.where(
+        displacement <= 0.0,
+        left_curvature,
+        right_curvature,
+    )
+    return peak_value - curvature * displacement**2
+
+
+def fit_asymmetric_peak_response(
+    parameter: np.ndarray,
+    ratio: np.ndarray,
+    sem: np.ndarray,
+) -> dict[str, float | str]:
+    """Match an asymmetric response through baseline, best, and tail means.
+
+    The three empirical anchors determine two nonnegative curvatures. This
+    phenomenological response is a visual matching function, not a physical
+    identification of the CVaR and QTL parameters.
+    """
+    parameter = np.asarray(parameter, dtype=float)
+    ratio = np.asarray(ratio, dtype=float)
+    sem = np.maximum(np.asarray(sem, dtype=float), 1e-3)
+    order = np.argsort(parameter)
+    parameter = parameter[order]
+    ratio = ratio[order]
+    sem = sem[order]
+    peak_index = int(np.argmax(ratio))
+    peak_parameter = float(parameter[peak_index])
+    peak_value = float(ratio[peak_index])
+    baseline_value = float(ratio[0])
+    tail_value = float(ratio[-1])
+    left_span = max(peak_parameter, np.finfo(float).eps)
+    right_span = max(1.0 - peak_parameter, np.finfo(float).eps)
+    left_curvature = max(
+        0.0,
+        (peak_value - baseline_value) / left_span**2,
+    )
+    right_curvature = max(
+        0.0,
+        (peak_value - tail_value) / right_span**2,
+    )
+    fitted = asymmetric_peak_model(
+        parameter,
+        peak_value,
+        peak_parameter,
+        left_curvature,
+        right_curvature,
+    )
+    return {
+        "model_formula": (
+            r"$R^\star-c_-(r-r^\star)^2$ for $r\leq r^\star$; "
+            r"$R^\star-c_+(r-r^\star)^2$ for $r>r^\star$"
+        ),
+        "peak_parameter": peak_parameter,
+        "peak_value": peak_value,
+        "left_curvature": left_curvature,
+        "right_curvature": right_curvature,
+        "baseline_value": baseline_value,
+        "tail_value": tail_value,
+        "weighted_sse": float(np.sum(((fitted - ratio) / sem) ** 2)),
+    }
+
+
+def cvar_control_coordinate(
+    alpha: np.ndarray,
+    alpha_min: float,
+) -> np.ndarray:
+    """Map CVaR alpha to a zero-to-one logarithmic control coordinate."""
+    alpha = np.asarray(alpha, dtype=float)
+    return -np.log(alpha) / np.log(1.0 / alpha_min)
+
+
+def fit_weighted_cubic(
+    parameter: np.ndarray,
+    ratio: np.ndarray,
+    sem: np.ndarray,
+) -> dict[str, object]:
+    """Fit a robust cubic using inverse-SEM normalized residuals."""
+    parameter = np.asarray(parameter, dtype=float)
+    ratio = np.asarray(ratio, dtype=float)
+    sem = np.maximum(np.asarray(sem, dtype=float), 1e-3)
+    if len(parameter) < 4:
+        raise ValueError("At least four points are required for a cubic fit.")
+    initial_coefficients = np.polynomial.polynomial.polyfit(
+        parameter,
+        ratio,
+        deg=3,
+        w=1.0 / sem,
+    )
+
+    def residuals(coefficients):
+        return (
+            cubic_model(parameter, *coefficients) - ratio
+        ) / sem
+
+    fit = least_squares(
+        residuals,
+        x0=initial_coefficients,
+        loss="soft_l1",
+        f_scale=1.0,
+        max_nfev=10000,
+    )
+    if not fit.success:
+        raise RuntimeError(f"Cubic fitting failed: {fit.message}")
+    a0, a1, a2, a3 = map(float, fit.x)
+    dense_parameter = np.linspace(
+        float(parameter.min()),
+        float(parameter.max()),
+        DENSE_POINTS,
+    )
+    dense_ratio = cubic_model(
+        dense_parameter,
+        a0,
+        a1,
+        a2,
+        a3,
+    )
+    peak_index = int(np.argmax(dense_ratio))
+    return {
+        "model_formula": r"$a_0+a_1x+a_2x^2+a_3x^3$",
+        "a0": a0,
+        "a1": a1,
+        "a2": a2,
+        "a3": a3,
+        "weighted_sse": float(np.sum(residuals(fit.x) ** 2)),
+        "peak_parameter": float(dense_parameter[peak_index]),
+        "peak_value": float(dense_ratio[peak_index]),
+        "tail_value": float(dense_ratio[-1]),
+        "gamma_dense": dense_parameter,
+        "ratio_dense": dense_ratio,
+    }
+
+
+def fit_fixed_qtl_curve(path: Path) -> MatchingCurveResult:
+    """Fit the 5,000-shot fixed-gamma QTL results with the shared cubic."""
+    path = Path(path)
+    frame = pd.read_csv(path)
+    required = {"gamma_plot", "mean_final_ratio", "sem_final_ratio"}
+    missing = required.difference(frame.columns)
+    if missing:
+        raise ValueError(f"{path} is missing columns: {sorted(missing)}")
+    frame = (
+        frame.dropna(subset=list(required))
+        .loc[lambda data: data["gamma_plot"] <= FIT_GAMMA_MAX]
+        .sort_values("gamma_plot")
+        .drop_duplicates("gamma_plot")
+    )
+    gamma = frame["gamma_plot"].to_numpy(dtype=float)
+    ratio = frame["mean_final_ratio"].to_numpy(dtype=float)
+    sem = np.maximum(
+        frame["sem_final_ratio"].to_numpy(dtype=float),
+        1e-3,
+    )
+    fit = fit_weighted_cubic(gamma, ratio, sem)
+    fit["model_formula"] = (
+        r"$a_0+a_1|\gamma|+a_2|\gamma|^2+a_3|\gamma|^3$"
+    )
+    return MatchingCurveResult(
+        parameter_data=gamma,
+        ratio_data=ratio,
+        sem_data=sem,
+        params={
+            key: value
+            for key, value in fit.items()
+            if key not in {"gamma_dense", "ratio_dense"}
+        },
+    )
+
+
 def validate_alphas(
     alphas: list[float] | tuple[float, ...],
     alpha_start: float,
@@ -108,9 +305,9 @@ def validate_alphas(
     values = tuple(sorted({float(alpha) for alpha in alphas}))
     if len(values) < 4:
         raise ValueError("At least four alpha values are needed for curve fitting.")
-    if values[0] < alpha_start - 1e-12 or values[-1] > 1.0:
+    if values[0] <= 0.0 or values[-1] > alpha_start + 1e-12:
         raise ValueError(
-            "Every alpha must lie between alpha_start and one."
+            "Every final alpha must lie in (0, alpha_start]."
         )
     return values
 
@@ -162,7 +359,7 @@ def alpha_at_step(
     step: int,
     total_steps: int,
 ) -> float:
-    """Return fixed alpha or the endpoint-inclusive linear alpha schedule."""
+    """Return fixed alpha or the endpoint-inclusive 1-to-alpha schedule."""
     if strategy == "fixed":
         return float(final_alpha)
     if strategy != "ascending":
@@ -312,6 +509,7 @@ def _run_restart(task: dict[str, object]) -> dict[str, object]:
         "record_type": "restart",
         "strategy": str(task["strategy"]),
         "alpha": float(task["alpha"]),
+        "one_minus_alpha": 1.0 - float(task["alpha"]),
         "alpha_start": (
             float(task["alpha"])
             if str(task["strategy"]) == "fixed"
@@ -321,7 +519,7 @@ def _run_restart(task: dict[str, object]) -> dict[str, object]:
         "schedule": (
             "constant"
             if str(task["strategy"]) == "fixed"
-            else "linear_ascending"
+            else "linear_descending_alpha"
         ),
         "graph_family": str(task["graph_family"]),
         "n": settings.n,
@@ -365,7 +563,7 @@ def build_tasks(
                         task_id = (
                             f"shots={settings.shots}|steps={settings.steps}|"
                             f"sim={settings.simulator}|"
-                            "seed_pairing=common_v1|"
+                            "seed_pairing=common_v2|"
                             f"alpha_start={settings.alpha_start:.12g}|"
                             f"{strategy}|{graph_family}|{graph_seed}|"
                             f"{alpha:.12g}|{initialization_id}"
@@ -418,6 +616,11 @@ def validate_paired_tasks(tasks: list[dict[str, object]]) -> None:
         if not np.array_equal(parameters[0], parameters[1]):
             raise ValueError(
                 "Paired strategies have different initial parameter vectors."
+            )
+        settings = pair["settings"].tolist()
+        if settings[0] != settings[1]:
+            raise ValueError(
+                "Paired strategies have different optimizer settings."
             )
 
 
@@ -527,6 +730,7 @@ def aggregate_restart_results(
                 "p",
                 "graph_seed",
                 "alpha",
+                "one_minus_alpha",
                 "alpha_start",
                 "alpha_end",
                 "schedule",
@@ -544,7 +748,14 @@ def aggregate_restart_results(
     )
     summary = (
         graph_average.groupby(
-            ["strategy", "alpha", "alpha_start", "alpha_end", "schedule"],
+            [
+                "strategy",
+                "alpha",
+                "one_minus_alpha",
+                "alpha_start",
+                "alpha_end",
+                "schedule",
+            ],
             as_index=False,
         )
         .agg(
@@ -572,25 +783,25 @@ def fit_cvar_summary(
     fits: dict[str, dict[str, object]] = {}
     for strategy in ("fixed", "ascending"):
         series = summary.loc[summary["strategy"] == strategy].sort_values(
-            "alpha"
+            "one_minus_alpha"
         )
         fit = fit_weighted_cubic(
-            series["alpha"].to_numpy(dtype=float),
+            series["one_minus_alpha"].to_numpy(dtype=float),
             series["mean_final_ratio"].to_numpy(dtype=float),
             np.maximum(
                 series["sem_final_ratio"].to_numpy(dtype=float),
                 1e-3,
             ),
         )
-        dense_alpha = np.linspace(
-            float(series["alpha"].min()),
-            float(series["alpha"].max()),
+        dense_risk = np.linspace(
+            float(series["one_minus_alpha"].min()),
+            float(series["one_minus_alpha"].max()),
             DENSE_POINTS,
         )
         coefficients = [
             float(fit[name]) for name in ("a0", "a1", "a2", "a3")
         ]
-        dense_ratio = cubic_model(dense_alpha, *coefficients)
+        dense_ratio = cubic_model(dense_risk, *coefficients)
         peak_index = int(np.argmax(dense_ratio))
         fits[strategy] = {
             **{
@@ -607,12 +818,13 @@ def fit_cvar_summary(
                 }
             },
             "model_formula": (
-                r"$a_0+a_1\alpha+a_2\alpha^2+a_3\alpha^3$"
+                r"$a_0+a_1(1-\alpha)+a_2(1-\alpha)^2"
+                r"+a_3(1-\alpha)^3$"
             ),
-            "peak_alpha": float(dense_alpha[peak_index]),
+            "peak_one_minus_alpha": float(dense_risk[peak_index]),
             "peak_value": float(dense_ratio[peak_index]),
             "tail_value": float(dense_ratio[-1]),
-            "alpha_dense": dense_alpha,
+            "one_minus_alpha_dense": dense_risk,
             "ratio_dense": dense_ratio,
         }
     return fits
@@ -648,6 +860,74 @@ def _fit_record(
     }
 
 
+def fixed_comparison_fit_rows(
+    summary: pd.DataFrame,
+    qtl_fit: MatchingCurveResult,
+    alpha_min: float,
+) -> list[dict[str, object]]:
+    """Fit and serialize fixed-objective landscape-response functions."""
+    cvar_data = summary.loc[summary["strategy"] == "fixed"].sort_values(
+        "alpha",
+        ascending=False,
+    )
+    log_denominator = np.log(1.0 / alpha_min)
+    cvar_fit = fit_asymmetric_peak_response(
+        cvar_control_coordinate(
+            cvar_data["alpha"].to_numpy(dtype=float),
+            alpha_min,
+        ),
+        cvar_data["mean_final_ratio"].to_numpy(dtype=float),
+        cvar_data["sem_final_ratio"].to_numpy(dtype=float),
+    )
+    qtl_response_fit = fit_asymmetric_peak_response(
+        qtl_fit.parameter_data / FIT_GAMMA_MAX,
+        qtl_fit.ratio_data,
+        qtl_fit.sem_data,
+    )
+    rows: list[dict[str, object]] = []
+    for method, mapping, fit in (
+        (
+            "CVaR",
+            (
+                rf"$r=-\ln(\alpha)/{log_denominator:.6g}$; "
+                rf"$\alpha_{{\min}}={alpha_min:g}$"
+            ),
+            cvar_fit,
+        ),
+        (
+            "QTL",
+            rf"$r=|\gamma|/{FIT_GAMMA_MAX:g}$",
+            qtl_response_fit,
+        ),
+    ):
+        rows.append(
+            {
+                "record_type": "comparison_matching_function",
+                "method": method,
+                "strategy": "fixed",
+                "parameter_name": "landscape_control_coordinate",
+                "parameter_mapping": mapping,
+                "alpha_gamma_relation": (
+                    rf"$\alpha=\exp[-\ln(1/{alpha_min:g})"
+                    rf"|\gamma|/{FIT_GAMMA_MAX:g}]$"
+                ),
+                "fit_model": (
+                    "baseline_peak_tail_anchored_"
+                    "asymmetric_quadratic"
+                ),
+                "fit_formula": fit["model_formula"],
+                "peak_parameter": fit["peak_parameter"],
+                "peak_value": fit["peak_value"],
+                "left_curvature": fit["left_curvature"],
+                "right_curvature": fit["right_curvature"],
+                "baseline_value": fit["baseline_value"],
+                "tail_value": fit["tail_value"],
+                "weighted_sse": fit["weighted_sse"],
+            }
+        )
+    return rows
+
+
 def build_output_frame(
     restart_frame: pd.DataFrame,
     graph_average: pd.DataFrame,
@@ -665,22 +945,33 @@ def build_output_frame(
     summary_rows.insert(0, "record_type", "summary")
 
     fit_rows = [
-        _fit_record("CVaR", strategy, "alpha", cvar_fits[strategy])
+        _fit_record(
+            "CVaR",
+            strategy,
+            "one_minus_alpha",
+            cvar_fits[strategy],
+        )
         for strategy in ("fixed", "ascending")
     ]
     fit_rows.append(
         _fit_record(
             "QTL",
-            "ascending",
+            "fixed",
             "absolute_gamma",
             qtl_fit.params,
         )
+    )
+    comparison_rows = fixed_comparison_fit_rows(
+        summary,
+        qtl_fit,
+        alpha_min=min(alphas),
     )
     frames = [
         restart_rows,
         graph_rows,
         summary_rows,
         pd.DataFrame(fit_rows),
+        pd.DataFrame(comparison_rows),
     ]
     output = pd.concat(frames, ignore_index=True, sort=False)
     metadata = {
@@ -692,6 +983,7 @@ def build_output_frame(
         "optimizer": "Polyak momentum gradient descent",
         "paired_initial_parameters": True,
         "paired_device_seeds": True,
+        "identical_optimizer_settings": True,
         "initialization_base_seed": INITIALIZATION_BASE_SEED,
         **{
             f"optimizer_{key}": value
@@ -711,6 +1003,75 @@ def build_output_frame(
     for column, value in metadata.items():
         output[column] = value
     return output
+
+
+def refresh_fit_records(
+    output_csv: Path,
+    cvar_fits: dict[str, dict[str, object]],
+    qtl_fit: MatchingCurveResult,
+    summary: pd.DataFrame,
+) -> None:
+    """Replace saved fit metadata without altering simulation records."""
+    frame = pd.read_csv(output_csv)
+    fit_rows = [
+        _fit_record(
+            "CVaR",
+            strategy,
+            "one_minus_alpha",
+            cvar_fits[strategy],
+        )
+        for strategy in ("fixed", "ascending")
+    ]
+    fit_rows.append(
+        _fit_record(
+            "QTL",
+            "fixed",
+            "absolute_gamma",
+            qtl_fit.params,
+        )
+    )
+    replacement = pd.DataFrame(
+        fit_rows
+        + fixed_comparison_fit_rows(
+            summary,
+            qtl_fit,
+            alpha_min=float(summary["alpha"].min()),
+        )
+    )
+    metadata_columns = {
+        "experiment",
+        "shots",
+        "steps",
+        "number_of_initializations",
+        "alpha_grid",
+        "optimizer",
+        "paired_initial_parameters",
+        "paired_device_seeds",
+        "identical_optimizer_settings",
+        "initialization_base_seed",
+    }
+    metadata_columns.update(
+        column
+        for column in frame.columns
+        if column.startswith("optimizer_")
+    )
+    for column in metadata_columns:
+        if column not in frame.columns:
+            continue
+        values = frame[column].dropna()
+        if not values.empty:
+            replacement[column] = values.iloc[0]
+    preserved = frame.loc[
+        ~frame["record_type"].isin(
+            {"matching_function", "comparison_matching_function"}
+        )
+    ]
+    refreshed = pd.concat(
+        [preserved, replacement],
+        ignore_index=True,
+        sort=False,
+    )
+    refreshed.to_csv(output_csv, index=False)
 
 
 def _publication_style() -> None:
@@ -740,12 +1101,12 @@ def plot_cvar_figure(
     output_jpg: Path,
     output_pdf: Path,
 ) -> None:
-    """Render Figure (d): fixed versus ascending CVaR over alpha."""
+    """Render Figure (d) against increasing CVaR risk strength 1-alpha."""
     _publication_style()
     styles = {
         "fixed": ("Fixed $\\alpha$", "#1F4E79", (0, (4, 3)), "o"),
         "ascending": (
-            "Ascending $\\alpha$",
+            r"Scheduled $\alpha:1\rightarrow\alpha$",
             "#D97706",
             "-",
             "s",
@@ -756,10 +1117,13 @@ def plot_cvar_figure(
     for strategy in ("fixed", "ascending"):
         label, color, line_style, marker = styles[strategy]
         series = summary.loc[summary["strategy"] == strategy].sort_values(
-            "alpha"
+            "one_minus_alpha"
         )
         fit = fits[strategy]
-        x_dense = np.asarray(fit["alpha_dense"], dtype=float)
+        x_dense = np.asarray(
+            fit["one_minus_alpha_dense"],
+            dtype=float,
+        )
         y_dense = np.asarray(fit["ratio_dense"], dtype=float)
         rms_sem = float(
             np.sqrt(np.mean(np.square(series["sem_final_ratio"])))
@@ -785,7 +1149,7 @@ def plot_cvar_figure(
             zorder=3,
         )
         axis.errorbar(
-            series["alpha"],
+            series["one_minus_alpha"],
             series["mean_final_ratio"],
             yerr=series["sem_final_ratio"],
             color=color,
@@ -801,13 +1165,19 @@ def plot_cvar_figure(
 
     y_min, y_max = padded_limits(displayed_values, padding_fraction=0.08)
     axis.set(
-        xlabel=r"CVaR confidence level $\alpha$",
+        xlabel=r"CVaR risk strength $1-\alpha$",
         ylabel="Mean final ratio",
-        xlim=(0.08, 1.02),
+        xlim=(-0.02, 0.92),
         ylim=(y_min, y_max),
     )
     axis.set_xticks(
-        sorted(summary["alpha"].dropna().unique().astype(float).tolist())
+        sorted(
+            summary["one_minus_alpha"]
+            .dropna()
+            .unique()
+            .astype(float)
+            .tolist()
+        )
     )
     axis.grid(
         axis="y",
@@ -818,7 +1188,7 @@ def plot_cvar_figure(
     )
     axis.grid(axis="x", visible=False)
     axis.tick_params(which="both", direction="in", top=True, right=True)
-    axis.legend(loc="best")
+    axis.legend(loc="upper right")
     axis.text(
         0.02,
         0.97,
@@ -832,60 +1202,220 @@ def plot_cvar_figure(
     save_figure(figure, output_jpg, output_pdf, dpi=600)
 
 
+def plot_fixed_alpha_figure(
+    summary: pd.DataFrame,
+    fixed_fit: dict[str, object],
+    output_jpg: Path,
+    output_pdf: Path,
+) -> None:
+    """Render a paper-ready fixed-alpha curve with a shaded SEM envelope."""
+    _publication_style()
+    plt.rcParams.update(
+        {
+            "font.size": 15,
+            "axes.labelsize": 17,
+            "xtick.labelsize": 13,
+            "ytick.labelsize": 13,
+            "legend.fontsize": 12.5,
+            "axes.linewidth": 1.15,
+            "xtick.major.size": 6,
+            "ytick.major.size": 6,
+            "xtick.minor.size": 3,
+            "ytick.minor.size": 3,
+        }
+    )
+    series = summary.loc[summary["strategy"] == "fixed"].sort_values(
+        "one_minus_alpha"
+    )
+    x_dense = np.asarray(
+        fixed_fit["one_minus_alpha_dense"],
+        dtype=float,
+    )
+    y_dense = np.asarray(fixed_fit["ratio_dense"], dtype=float)
+    sem_dense = np.interp(
+        x_dense,
+        series["one_minus_alpha"].to_numpy(dtype=float),
+        series["sem_final_ratio"].to_numpy(dtype=float),
+    )
+
+    figure, axis = plt.subplots(figsize=(7.2, 5.25))
+    sem_artist = axis.fill_between(
+        x_dense,
+        y_dense - sem_dense,
+        y_dense + sem_dense,
+        color="#1F4E79",
+        alpha=0.09,
+        linewidth=0,
+        label=r"Mean $\pm$ graph-level SEM",
+        zorder=1,
+    )
+    fit_artist, = axis.plot(
+        x_dense,
+        y_dense,
+        color="#1F4E79",
+        linestyle=(0, (4, 3)),
+        linewidth=2.25,
+        label=r"Fixed-$\alpha$ cubic fit",
+        zorder=3,
+    )
+    axis.scatter(
+        series["one_minus_alpha"],
+        series["mean_final_ratio"],
+        marker="o",
+        color="#1F4E79",
+        s=58,
+        edgecolors="white",
+        linewidths=0.7,
+        zorder=4,
+    )
+    y_min, y_max = padded_limits(
+        [y_dense - sem_dense, y_dense + sem_dense],
+        padding_fraction=0.07,
+    )
+    axis.set(
+        xlabel=r"CVaR risk strength $1-\alpha$",
+        ylabel="Mean Final Ratio",
+        xlim=(-0.02, 0.92),
+        ylim=(y_min, y_max),
+    )
+    axis.set_xticks(
+        sorted(
+            series["one_minus_alpha"]
+            .dropna()
+            .unique()
+            .astype(float)
+            .tolist()
+        )
+    )
+    axis.grid(
+        axis="y",
+        color="#D0D0D0",
+        linestyle=(0, (3, 3)),
+        linewidth=0.75,
+        alpha=0.75,
+    )
+    axis.grid(axis="x", visible=False)
+    axis.tick_params(which="both", direction="in", top=True, right=True)
+    for spine in axis.spines.values():
+        spine.set_linewidth(1.15)
+    axis.legend(
+        handles=[fit_artist, sem_artist],
+        loc="upper right",
+        handlelength=3.0,
+        borderaxespad=0.45,
+    )
+    save_figure(figure, output_jpg, output_pdf, dpi=600)
+
+
 def plot_performance_matching_functions(
-    ascending_cvar_fit: dict[str, object],
+    summary: pd.DataFrame,
     qtl_fit,
     *,
     alpha_min: float,
     output_jpg: Path,
     output_pdf: Path,
 ) -> None:
-    """Plot ascending CVaR and QTL matching functions on common risk strength."""
+    """Compare fixed CVaR and QTL responses under a log/exp parameter map."""
     _publication_style()
-    risk_strength = np.linspace(0.0, 1.0, DENSE_POINTS)
-    cvar_alpha = 1.0 - risk_strength * (1.0 - alpha_min)
-    qtl_gamma = FIT_GAMMA_MAX * risk_strength
-    cvar_coefficients = [
-        float(ascending_cvar_fit[name])
-        for name in ("a0", "a1", "a2", "a3")
-    ]
-    qtl_coefficients = [
-        float(qtl_fit.params[name])
-        for name in ("a0", "a1", "a2", "a3")
-    ]
-    cvar_ratio = cubic_model(cvar_alpha, *cvar_coefficients)
-    qtl_ratio = cubic_model(qtl_gamma, *qtl_coefficients)
+    plt.rcParams.update(
+        {
+            "font.size": 15,
+            "axes.labelsize": 17,
+            "xtick.labelsize": 13,
+            "ytick.labelsize": 13,
+            "legend.fontsize": 12.5,
+            "axes.linewidth": 1.15,
+        }
+    )
+    control_coordinate = np.linspace(0.0, 1.0, DENSE_POINTS)
+    cvar_data = summary.loc[summary["strategy"] == "fixed"].sort_values(
+        "alpha",
+        ascending=False,
+    )
+    cvar_control = cvar_control_coordinate(
+        cvar_data["alpha"].to_numpy(dtype=float),
+        alpha_min,
+    )
+    qtl_control = qtl_fit.parameter_data / FIT_GAMMA_MAX
+    cvar_fit = fit_asymmetric_peak_response(
+        cvar_control,
+        cvar_data["mean_final_ratio"].to_numpy(dtype=float),
+        cvar_data["sem_final_ratio"].to_numpy(dtype=float),
+    )
+    qtl_response_fit = fit_asymmetric_peak_response(
+        qtl_control,
+        qtl_fit.ratio_data,
+        qtl_fit.sem_data,
+    )
+    cvar_ratio = asymmetric_peak_model(
+        control_coordinate,
+        float(cvar_fit["peak_value"]),
+        float(cvar_fit["peak_parameter"]),
+        float(cvar_fit["left_curvature"]),
+        float(cvar_fit["right_curvature"]),
+    )
+    qtl_ratio = asymmetric_peak_model(
+        control_coordinate,
+        float(qtl_response_fit["peak_value"]),
+        float(qtl_response_fit["peak_parameter"]),
+        float(qtl_response_fit["left_curvature"]),
+        float(qtl_response_fit["right_curvature"]),
+    )
 
-    figure, axis = plt.subplots(figsize=(8.2, 6.0))
+    figure, axis = plt.subplots(figsize=(7.35, 5.45))
     axis.plot(
-        risk_strength,
+        control_coordinate,
         cvar_ratio,
-        color="#7A3E9D",
+        color="#1F4E79",
         linestyle="-",
-        linewidth=2.5,
-        label=(
-            r"Ascending CVaR fit "
-            rf"($\alpha=1-{1.0-alpha_min:.1f}r$)"
-        ),
+        linewidth=2.35,
+        label="Fixed CVaR response",
     )
     axis.plot(
-        risk_strength,
+        control_coordinate,
         qtl_ratio,
-        color="#157A6E",
+        color="#C4512D",
         linestyle=(0, (5, 3)),
-        linewidth=2.5,
-        label=(
-            r"Ascending QTL fit "
-            rf"($|\gamma|={FIT_GAMMA_MAX:g}r$)"
-        ),
+        linewidth=2.35,
+        label="Fixed QTL response",
+    )
+    axis.scatter(
+        cvar_control,
+        cvar_data["mean_final_ratio"].to_numpy(dtype=float),
+        s=42,
+        marker="o",
+        facecolor="white",
+        edgecolor="#1F4E79",
+        linewidth=1.25,
+        zorder=4,
+        label="CVaR means",
+    )
+    axis.scatter(
+        qtl_control,
+        qtl_fit.ratio_data,
+        s=42,
+        marker="s",
+        facecolor="white",
+        edgecolor="#C4512D",
+        linewidth=1.25,
+        zorder=4,
+        label="QTL means",
     )
     y_min, y_max = padded_limits(
-        [cvar_ratio, qtl_ratio],
+        [
+            cvar_ratio,
+            qtl_ratio,
+            cvar_data["mean_final_ratio"].to_numpy(dtype=float),
+            qtl_fit.ratio_data,
+        ],
         padding_fraction=0.10,
     )
     axis.set(
-        xlabel=r"Normalized risk strength $r$",
-        ylabel="Matched mean final ratio",
+        xlabel=(
+            r"Landscape-control coordinate "
+            rf"$r=|\gamma|/{FIT_GAMMA_MAX:g}$"
+        ),
+        ylabel="Mean Final Ratio",
         xlim=(0.0, 1.0),
         ylim=(y_min, y_max),
     )
@@ -893,11 +1423,44 @@ def plot_performance_matching_functions(
         True,
         color="#D4D4D4",
         linestyle=(0, (3, 3)),
-        linewidth=0.8,
-        alpha=0.9,
+        linewidth=0.75,
+        alpha=0.75,
     )
-    axis.tick_params(which="both", direction="in", top=True, right=True)
-    axis.legend(loc="best")
+    axis.tick_params(which="both", direction="in", top=False, right=True)
+    axis.legend(
+        loc="lower left",
+        ncol=2,
+        handlelength=2.7,
+        columnspacing=1.25,
+    )
+    secondary_axis = axis.secondary_xaxis(
+        "top",
+        functions=(
+            lambda coordinate: alpha_min**np.asarray(coordinate),
+            lambda alpha: cvar_control_coordinate(
+                np.maximum(
+                    np.asarray(alpha),
+                    np.finfo(float).tiny,
+                ),
+                alpha_min,
+            ),
+        ),
+    )
+    alpha_ticks = np.array([1.0, 0.8, 0.5, 0.2, alpha_min])
+    secondary_axis.set_xticks(alpha_ticks)
+    secondary_axis.set_xticklabels(
+        [f"{alpha:g}" for alpha in alpha_ticks]
+    )
+    secondary_axis.set_xlabel(
+        (
+            r"Equivalent CVaR tail fraction "
+            rf"$\alpha={alpha_min:g}^r="
+            rf"\exp[-\ln(1/{alpha_min:g})|\gamma|/"
+            rf"{FIT_GAMMA_MAX:g}]$"
+        ),
+        labelpad=8,
+    )
+    secondary_axis.tick_params(direction="in", pad=4)
     save_figure(figure, output_jpg, output_pdf, dpi=600)
 
 
@@ -908,6 +1471,7 @@ def load_summary_from_output(path: Path) -> pd.DataFrame:
         "record_type",
         "strategy",
         "alpha",
+        "one_minus_alpha",
         "mean_final_ratio",
         "sem_final_ratio",
     }
@@ -928,14 +1492,16 @@ def run_experiment(
     output_csv: Path,
     output_cvar_jpg: Path,
     output_cvar_pdf: Path,
+    output_fixed_jpg: Path,
+    output_fixed_pdf: Path,
     output_performance_jpg: Path,
     output_performance_pdf: Path,
-    qtl_ascending_csv: Path,
+    qtl_fixed_csv: Path,
     resume: bool = True,
 ) -> pd.DataFrame:
     """Execute, aggregate, fit, save, and plot the complete experiment."""
     alphas = validate_alphas(alphas, settings.alpha_start)
-    qtl_fit = fit_curve_result("Ascending QTL", qtl_ascending_csv)
+    qtl_fit = fit_fixed_qtl_curve(qtl_fixed_csv)
     tasks = build_tasks(settings, alphas)
     validate_paired_tasks(tasks)
     checkpoint_path = output_csv.with_suffix(output_csv.suffix + ".partial")
@@ -965,8 +1531,14 @@ def run_experiment(
         output_cvar_jpg,
         output_cvar_pdf,
     )
+    plot_fixed_alpha_figure(
+        summary,
+        cvar_fits["fixed"],
+        output_fixed_jpg,
+        output_fixed_pdf,
+    )
     plot_performance_matching_functions(
-        cvar_fits["ascending"],
+        summary,
         qtl_fit,
         alpha_min=min(alphas),
         output_jpg=output_performance_jpg,
@@ -975,7 +1547,7 @@ def run_experiment(
     if checkpoint_path.exists():
         checkpoint_path.unlink()
     print(
-        f"Saved {output_csv.name} and four figures in "
+        f"Saved {output_csv.name} and six figure files in "
         f"{time.time() - started_at:.2f}s.",
         flush=True,
     )
@@ -987,22 +1559,31 @@ def replot(
     output_csv: Path,
     output_cvar_jpg: Path,
     output_cvar_pdf: Path,
+    output_fixed_jpg: Path,
+    output_fixed_pdf: Path,
     output_performance_jpg: Path,
     output_performance_pdf: Path,
-    qtl_ascending_csv: Path,
+    qtl_fixed_csv: Path,
 ) -> None:
     """Regenerate both figures from an existing CVaR CSV."""
     summary = load_summary_from_output(output_csv)
     fits = fit_cvar_summary(summary)
-    qtl_fit = fit_curve_result("Ascending QTL", qtl_ascending_csv)
+    qtl_fit = fit_fixed_qtl_curve(qtl_fixed_csv)
+    refresh_fit_records(output_csv, fits, qtl_fit, summary)
     plot_cvar_figure(
         summary,
         fits,
         output_cvar_jpg,
         output_cvar_pdf,
     )
+    plot_fixed_alpha_figure(
+        summary,
+        fits["fixed"],
+        output_fixed_jpg,
+        output_fixed_pdf,
+    )
     plot_performance_matching_functions(
-        fits["ascending"],
+        summary,
         qtl_fit,
         alpha_min=float(summary["alpha"].min()),
         output_jpg=output_performance_jpg,
@@ -1045,6 +1626,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--cvar-jpg", type=Path, default=DEFAULT_CVAR_JPG)
     parser.add_argument("--cvar-pdf", type=Path, default=DEFAULT_CVAR_PDF)
     parser.add_argument(
+        "--fixed-jpg",
+        type=Path,
+        default=DEFAULT_FIXED_JPG,
+    )
+    parser.add_argument(
+        "--fixed-pdf",
+        type=Path,
+        default=DEFAULT_FIXED_PDF,
+    )
+    parser.add_argument(
         "--performance-jpg",
         type=Path,
         default=DEFAULT_PERFORMANCE_JPG,
@@ -1055,9 +1646,9 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_PERFORMANCE_PDF,
     )
     parser.add_argument(
-        "--qtl-ascending-csv",
+        "--qtl-fixed-csv",
         type=Path,
-        default=DEFAULT_QTL_ASCENDING_CSV,
+        default=DEFAULT_QTL_FIXED_CSV,
     )
     parser.add_argument(
         "--no-resume",
@@ -1081,9 +1672,11 @@ def main() -> None:
             "output_csv": arguments.csv,
             "output_cvar_jpg": arguments.cvar_jpg,
             "output_cvar_pdf": arguments.cvar_pdf,
+            "output_fixed_jpg": arguments.fixed_jpg,
+            "output_fixed_pdf": arguments.fixed_pdf,
             "output_performance_jpg": arguments.performance_jpg,
             "output_performance_pdf": arguments.performance_pdf,
-            "qtl_ascending_csv": arguments.qtl_ascending_csv,
+            "qtl_fixed_csv": arguments.qtl_fixed_csv,
         }.items()
     }
     if arguments.plot_only:

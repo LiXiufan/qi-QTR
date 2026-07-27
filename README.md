@@ -25,18 +25,18 @@ responsibility: MaxCut, QAOA, QTL optimization, experiment sweeps, and plotting.
 The fixed- and ascending-tilt experiments use exactly the same optimizer:
 
 ```text
-learning rate                    0.22
-learning-rate decay power        0.30
-learning-rate decay offset       4.0
-Polyak momentum                  0.75
-tilt learning-rate penalty       0.005
-gradient clipping threshold      3.0
+learning rate                    0.18
+learning-rate decay power        0.35
+learning-rate decay offset       6.0
+Polyak momentum                  0.70
+tilt learning-rate penalty       0.01
+gradient clipping threshold      2.5
 ```
 
 At optimization step `t`, the effective learning rate is
 
 ```text
-0.22 / (t + 1 + 4)^0.30 / (1 + 0.005 |gamma_t|).
+0.18 / (t + 1 + 6)^0.35 / (1 + 0.01 |gamma_t|).
 ```
 
 Both experiment functions construct their settings through
@@ -47,12 +47,25 @@ The fixed- and ascending-tilt sweeps also call the same
 `experiments.build_tilt_initial_points` helper. Consequently, every paired
 graph/initialization uses the identical seed and initial QAOA parameter vector
 in both sweeps. The shared base seed is `20260429`, and parameters are sampled
-from `[0, 2π)`.
+from `[0, 2*pi)`.
 
-This profile was the highest-ranked candidate in the included reproducible
-ascending-gamma screen. The comparison is a bounded empirical selection, not a
-claim of a global optimum. See `REPRODUCIBILITY.md` for the benchmark and CSV
-artifacts.
+The shared optimizer is the original ascending-gamma profile. It is now also
+used by the fixed-gamma sweep to keep the comparison controlled.
+
+## Ascending-gamma convention
+
+Ascending inputs and the Figure (b) x-axis denote the requested average gamma,
+not the last gamma. The original linear ramp is retained. For `T` steps and a
+requested average `g`, step `t=0,...,T-1` uses
+
+```text
+gamma_t = 2 * g * t / T.
+```
+
+Thus `g=4` with four steps produces `0,2,4,6`, whose discrete average is `3`;
+with 100 steps the realized average is `3.96`, approaching the requested value
+`4`. The ascending CSV records the requested average, realized average,
+exclusive endpoint, and last applied gamma explicitly.
 
 ## Environment setup
 

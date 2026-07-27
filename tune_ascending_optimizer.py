@@ -1,10 +1,11 @@
-"""Screen optimizer profiles on a reproducible ascending-tilt benchmark.
+"""Compare optimizer profiles on a reproducible ascending-tilt benchmark.
 
 This is a deliberately smaller selection experiment than the production sweep.
 Every profile sees the same graphs, initial parameters, finite-shot device
-seeds, gamma schedules, and optimization budget.  The output records both the
-individual benchmark runs and an aggregate ranking so the selected production
-profile is auditable.
+seeds, gamma schedules, and optimization budget. The output records both the
+individual benchmark runs and an aggregate diagnostic ranking. Production
+settings remain controlled explicitly in
+``experiments.SHARED_TILT_OPTIMIZER``.
 """
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ DEFAULT_RUNS_CSV = Path(
     "data_and_figures/ascending_optimizer_screening_runs.csv"
 )
 DEFAULT_GRAPH_SEEDS = (0, 1, 2)
-DEFAULT_GAMMA_ENDPOINTS = (0.8, 2.0, 4.0)
+DEFAULT_GAMMA_AVERAGES = (0.8, 2.0, 4.0)
 
 # The original ascending profile is the reference.  The alternatives vary all
 # six requested controls while remaining close enough to be plausible for the
@@ -100,7 +101,7 @@ def _evaluate_profile(
     shots: int,
     steps: int,
     graph_seeds: tuple[int, ...],
-    gamma_endpoints: tuple[float, ...],
+    gamma_averages: tuple[float, ...],
 ) -> list[dict[str, float | int | str]]:
     """Evaluate one profile on all common benchmark cases."""
     initialization_seed, initial_parameters = build_initial_points(
@@ -117,13 +118,13 @@ def _evaluate_profile(
 
     rows: list[dict[str, float | int | str]] = []
     for graph_seed in graph_seeds:
-        for gamma_end in gamma_endpoints:
+        for gamma_average in gamma_averages:
             objective = ObjectiveSpec(
-                name=f"ascending_qtl_0_to_{gamma_end:g}",
+                name=f"ascending_qtl_average_{gamma_average:g}",
                 kind="qtl_schedule",
                 gamma_start=0.0,
-                gamma_end=gamma_end,
-                schedule="linear",
+                gamma_end=2.0 * gamma_average,
+                schedule="linear_average",
             )
             result = execute_run(
                 RunSpec(
@@ -142,7 +143,7 @@ def _evaluate_profile(
                 {
                     "profile": profile_name,
                     "graph_seed": graph_seed,
-                    "gamma_end": gamma_end,
+                    "gamma_average": gamma_average,
                     "final_mean_ratio": result.summary["final_mean_ratio"],
                     "tail_mean_ratio": result.summary["tail_mean_ratio"],
                     "final_optimal_mass": result.summary[
@@ -167,7 +168,7 @@ def screen_profiles(
     output_csv: Path,
     runs_csv: Path,
     graph_seeds: tuple[int, ...] = DEFAULT_GRAPH_SEEDS,
-    gamma_endpoints: tuple[float, ...] = DEFAULT_GAMMA_ENDPOINTS,
+    gamma_averages: tuple[float, ...] = DEFAULT_GAMMA_AVERAGES,
 ) -> pd.DataFrame:
     """Run and rank the candidate profiles, then write both CSV artifacts."""
     all_rows: list[dict[str, float | int | str]] = []
@@ -181,7 +182,7 @@ def screen_profiles(
                 shots=shots,
                 steps=steps,
                 graph_seeds=graph_seeds,
-                gamma_endpoints=gamma_endpoints,
+                gamma_averages=gamma_averages,
             ): name
             for name, profile in CANDIDATE_PROFILES.items()
         }
@@ -198,7 +199,7 @@ def screen_profiles(
             )
 
     runs = pd.DataFrame(all_rows).sort_values(
-        ["profile", "graph_seed", "gamma_end"]
+        ["profile", "graph_seed", "gamma_average"]
     )
     aggregate = (
         runs.groupby("profile", sort=False)
@@ -219,7 +220,7 @@ def screen_profiles(
     aggregate["shots"] = shots
     aggregate["steps"] = steps
     aggregate["graph_seeds"] = ",".join(map(str, graph_seeds))
-    aggregate["gamma_endpoints"] = ",".join(map(str, gamma_endpoints))
+    aggregate["gamma_averages"] = ",".join(map(str, gamma_averages))
     aggregate = aggregate.sort_values(
         ["mean_final_ratio", "mean_tail_ratio", "worst_final_ratio"],
         ascending=False,
